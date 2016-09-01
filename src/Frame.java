@@ -1,5 +1,3 @@
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
@@ -52,7 +50,7 @@ import java.awt.SystemColor;
 
 public class Frame {
 
-	private JFrame frame;
+	JFrame frame;
 	private JTextField textField_1;
 	private JCheckBox chckbxToConsole;
 	private JCheckBox chckbxToTextFile;
@@ -60,8 +58,6 @@ public class Frame {
 	private JRadioButton rdbtnAllRecords;
 
 	private JFileChooser fc = new JFileChooser();
-    //private File inputFile = null;
-    //private File outputDirectory = null;
     private JTextField textField;
     private JTextField textField_2;
     
@@ -74,21 +70,7 @@ public class Frame {
     private JTextField textField_3;
     private JTextField textField_4;
 	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Frame window = new Frame();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+
 
 	/**
 	 * Create the application.
@@ -126,8 +108,6 @@ public class Frame {
 		panel_1.setBorder(null);
 		panel_2.add(panel_1, BorderLayout.CENTER);
 	    
-	    //ButtonGroup group = new ButtonGroup();
-		
 		ButtonGroup group1 = new ButtonGroup();
 	    panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.Y_AXIS));
 	    
@@ -309,18 +289,13 @@ public class Frame {
 	    Component horizontalStrut = Box.createHorizontalStrut(20);
 	    panel_9.add(horizontalStrut);
 	    
-	    Component horizontalStrut_2 = Box.createHorizontalStrut(20);
-	    panel_9.add(horizontalStrut_2);
-	    
-	    Component horizontalStrut_3 = Box.createHorizontalStrut(20);
-	    panel_9.add(horizontalStrut_3);
-	    
-	    JLabel lblEnterSearchTerm = new JLabel("Search term:");
+	    JLabel lblEnterSearchTerm = new JLabel("    Search term / error:");
 	    panel_9.add(lblEnterSearchTerm);
 	    
 	    textField_1 = new JTextField();
 	    panel_9.add(textField_1);
 	    textField_1.setColumns(16);
+	    comboBox.addItem("general");
 	    comboBox.addItem("error type");
 	    comboBox.addItem("location");
 	    comboBox.addItem("time range");
@@ -421,8 +396,7 @@ public class Frame {
 		frame.getContentPane().add(panel_3, BorderLayout.SOUTH);
 		
 		JLabel lblcopy = new JLabel("\u00a9 2016");
-		panel_3.add(lblcopy);
-		
+		panel_3.add(lblcopy);	
 	}
 	
 	class OutputGenerator implements ActionListener {
@@ -453,13 +427,10 @@ public class Frame {
 	    	  }
 	    	  
 	    	String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
-
+	    	// fix double cat issue
 			outputDirectory += "\\CAT " + dateTime + ".txt";
-			//System.out.println(outputDirectory);
 			Reader reader = new Reader();
-	    	//String output = "";
 
-	    
 	    		if (chckbxToConsole.isSelected()) {
 	    			try {
 						reader.parseLog(inputDirectory, rdbtnErrorsOnly.isSelected());
@@ -515,13 +486,17 @@ public class Frame {
 			Searcher search = new Searcher();
 			String term = textField_1.getText().trim().toLowerCase();
 			//System.out.println(term);
-			try {
-				search.searchGeneral(inputDirectory, term, true);
-			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			if (!term.isEmpty()) {
+				try {
+					search.searchGeneral(inputDirectory, term, true);
+				} catch (FileNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
-			
+			else {
+				//give warning
+			}
 		}
 		
 	}

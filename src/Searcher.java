@@ -4,9 +4,6 @@ import java.util.Scanner;
 
 public class Searcher {
 
-	public void searchTime(String startTime, String endTime) {
-		
-	}
 	
 	public void searchGeneral(String inputDirectory, String term, boolean errorsOnly) throws FileNotFoundException {
 		
@@ -62,5 +59,17 @@ public class Searcher {
 	}
 	
 	
+
+	public void searchTimeFrame(String inputDirectory, String term, String startTime, String endTime, boolean errorsOnly) {
+		
+	}
+	
+	public void searchLocation(String inputDirectory, String location, boolean errorsOnly) {
+		
+	}
+	
+	public void searchSensor(String inputDirectory, String sensor, boolean errorsOnly) {
+		
+	}
 
 }
