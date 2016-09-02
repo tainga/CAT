@@ -211,5 +211,10 @@ public class Error {
 		return false;
 	}
 	
+	public String getLocation() {
+		if (location != null) return location;
+		return "";
+	}
+	
 
 }

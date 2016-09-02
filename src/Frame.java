@@ -497,7 +497,7 @@ public class Frame {
 			// add graying stuff out, add warnings in each case
 			switch (option) {
 			case "general": term = textField_1.getText(); break;
-			case "error type": term = textField_1.getText(); break;
+			case "error type": term = textField_1.getText(); break;  //account for empty/whitespace search field
 			case "location": /*grab the nunio*/; break;
 			case "sensor": /*grab the radar*/; break;
 			case "time range": /*grab and concatenate time*/; break;
