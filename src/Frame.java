@@ -69,7 +69,7 @@ public class Frame {
     private JLabel modeWarnLbl;
     private JTextField textField_3;
     private JTextField textField_4;
-	
+	private JComboBox<String> comboBox;
 
 
 	/**
@@ -139,7 +139,7 @@ public class Frame {
 	    Component horizontalGlue_3 = Box.createHorizontalGlue();
 	    panel_4.add(horizontalGlue_3);
 	    
-	    outputWarnLbl = new JLabel("New label");
+	    outputWarnLbl = new JLabel("");
 	    outputWarnLbl.setForeground(Color.red);
 	    panel_4.add(outputWarnLbl);
 	    
@@ -159,7 +159,7 @@ public class Frame {
 	    Component horizontalGlue_6 = Box.createHorizontalGlue();
 	    panel_4.add(horizontalGlue_6);
 	    
-	    modeWarnLbl = new JLabel("New label");
+	    modeWarnLbl = new JLabel("");
 	    modeWarnLbl.setForeground(Color.red);
 	    panel_4.add(modeWarnLbl);
 	    
@@ -283,7 +283,7 @@ public class Frame {
 	    JLabel lblSearchBy = new JLabel("Search by ");
 	    panel_9.add(lblSearchBy);
 	    
-	    JComboBox<String> comboBox = new JComboBox<String>();
+	    comboBox = new JComboBox<String>();
 	    panel_9.add(comboBox);
 	    
 	    Component horizontalStrut = Box.createHorizontalStrut(20);
@@ -298,6 +298,7 @@ public class Frame {
 	    comboBox.addItem("general");
 	    comboBox.addItem("error type");
 	    comboBox.addItem("location");
+	    comboBox.addItem("sensor");
 	    comboBox.addItem("time range");
 	    
 	    JPanel panel_12 = new JPanel();
@@ -408,10 +409,10 @@ public class Frame {
 			  modeWarnLbl.setText("");
 	    	  
 	    	  if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
-	    		  outputWarnLbl.setText("Select output method");
+	    		  outputWarnLbl.setText("Select output");
 	    	  }
 	    	  if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
-	    		  modeWarnLbl.setText("Please select mode");
+	    		  modeWarnLbl.setText("Select mode");
 	    	  }
 	    	  if (chckbxToTextFile.isSelected() && outputDirectory == null) {
 	    		  warning += "Please select output directory<br>";
@@ -426,10 +427,13 @@ public class Frame {
 	    		  return;
 	    	  }
 	    	  
-	    	String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
-	    	// fix double cat issue
-			outputDirectory += "\\CAT " + dateTime + ".txt";
-			Reader reader = new Reader();
+	    	  if (chckbxToTextFile.isSelected()) {
+		    	String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
+		    	outputDirectory = fc.getSelectedFile().getAbsolutePath();
+				outputDirectory += "\\CAT " + dateTime + ".txt";
+	    	  }
+			
+	    	  Reader reader = new Reader();
 
 	    		if (chckbxToConsole.isSelected()) {
 	    			try {
@@ -457,24 +461,21 @@ public class Frame {
 		public void actionPerformed(ActionEvent e) {
 			
 			String warning = "";
-			warnLabel.setText(warning);
-			outputWarnLbl.setText("");
-			modeWarnLbl.setText("");
+	    	  warnLabel.setText(warning);
+	    	  outputWarnLbl.setText("");
+			  modeWarnLbl.setText("");
 	    	  
-			  if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
-	    		  outputWarnLbl.setText("Select output method");
+	    	  if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
+	    		  outputWarnLbl.setText("Select output");
 	    	  }
 	    	  if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
-	    		  modeWarnLbl.setText("Please select mode");
+	    		  modeWarnLbl.setText("Select mode");
 	    	  }
 	    	  if (chckbxToTextFile.isSelected() && outputDirectory == null) {
-	    		  warning += "Please choose output directory<br>";
+	    		  warning += "Please select output directory<br>";
 	    	  }
 	    	  if (inputDirectory == null) {
 	    		  warning += "Please select input directory<br>";
-	    	  }
-	    	  if (textField_1.getText().isEmpty()) {
-	    		  warning += "Please enter a search term<br>";
 	    	  }
 			
 	    	  if (!warning.equals("")) {
@@ -482,21 +483,34 @@ public class Frame {
 	    		  warnLabel.setText(warning);
 	    		  return;
 	    	  }
+	    	  
+	    	if (chckbxToTextFile.isSelected()) {
+			    String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
+			    outputDirectory = fc.getSelectedFile().getAbsolutePath();
+				outputDirectory += "\\CAT " + dateTime + ".txt";
+		    }
 			
-			Searcher search = new Searcher();
-			String term = textField_1.getText().trim().toLowerCase();
-			//System.out.println(term);
-			if (!term.isEmpty()) {
-				try {
-					search.searchGeneral(inputDirectory, term, true);
-				} catch (FileNotFoundException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+			Searcher finder = new Searcher();
+			String term = "";
+			String option = (String) comboBox.getSelectedItem();
+			
+			// add graying stuff out, add warnings in each case
+			switch (option) {
+			case "general": term = textField_1.getText(); break;
+			case "error type": term = textField_1.getText(); break;
+			case "location": /*grab the nunio*/; break;
+			case "sensor": /*grab the radar*/; break;
+			case "time range": /*grab and concatenate time*/; break;
+			default: System.out.println("wrong 'search by' option");
 			}
-			else {
-				//give warning
+			
+			try {
+				finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected());
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
+			
 		}
 		
 	}
