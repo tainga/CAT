@@ -11,54 +11,7 @@ import org.omg.Messaging.SyncScopeHelper;
 
 public class Reader {
 
-	
-	/*
-	public void reportToTextFile(String inputDirectory, String output) throws FileNotFoundException {
-
-		  File dir = new File(inputDirectory);
-		  
-		  File[] directoryListing = dir.listFiles();
-		  
-		  PrintWriter writer = new PrintWriter(output);
 		
-		  if (directoryListing != null) {
-		    for (File log : directoryListing) {
-		      
-		    	if (log.getName().substring(0, 7).equals("control")) {
-			    	Scanner reader = new Scanner(log);
-					String previous = "";
-	
-					while (reader.hasNextLine()) {
-						String line = reader.nextLine();
-						
-						if (isErrorLine(line)) { 
-							Error error = parse(previous, line);
-							writer.println(error);
-						}
-						else {
-							previous = line;
-						}
-					}
-					
-					reader.close();
-		    	}
-		    	else continue;
-		    	
-		    }
-		    
-		  } else {
-		    // Handle the case where dir is not really a directory.
-		    // Checking dir.isDirectory() above would not be sufficient
-		    // to avoid race conditions with another process that deletes
-		    // directories.
-		  }
-		  
-		  writer.close();
-		  
-	}
-	*/
-	
-	
 	// prints error report to console
 	public void parseLog(String inputDirectory, boolean errorsOnly) throws FileNotFoundException {
 		

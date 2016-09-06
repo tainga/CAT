@@ -1,4 +1,5 @@
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -214,6 +215,22 @@ public class Error {
 	public String getLocation() {
 		if (location != null) return location;
 		return "";
+	}
+	
+	public GregorianCalendar getDateTime() {
+		try {
+			String[] tmpDate = date.split("/");
+			String[] tmpTime = time.split(":");
+			GregorianCalendar dateTime = new GregorianCalendar(Integer.parseInt(tmpDate[2]), Integer.parseInt(tmpDate[0]), Integer.parseInt(tmpDate[1]), Integer.parseInt(tmpTime[0]), Integer.parseInt(tmpTime[1]), Integer.parseInt(tmpTime[2]));
+			return dateTime;
+		} catch (Exception e) {
+			System.out.println("Error parsing date and time");
+		}
+		return null;
+	}
+	
+	public String getType() {
+		return type;
 	}
 	
 

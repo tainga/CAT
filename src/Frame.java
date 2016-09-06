@@ -38,6 +38,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
@@ -70,6 +72,11 @@ public class Frame {
     private JTextField textField_3;
     private JTextField textField_4;
 	private JComboBox<String> comboBox;
+	private JComboBox<Integer> comboBox_1;
+	private JComboBox<Integer> comboBox_2;
+	private JComboBox<Integer> comboBox_3;
+	private JComboBox<Integer> comboBox_4;
+	private JComboBox<Integer> comboBox_5;
 
 
 	/**
@@ -307,14 +314,14 @@ public class Frame {
 	    JLabel lblLocation = new JLabel("Location (rack/module/line):");
 	    panel_12.add(lblLocation);
 	    
-	    JComboBox<Integer> comboBox_1 = new JComboBox<Integer>();
+	    comboBox_1 = new JComboBox<Integer>();
 	    comboBox_1.addItem(0);
 	    comboBox_1.addItem(1);
 	    comboBox_1.addItem(2);
 	    comboBox_1.addItem(3);
 	    panel_12.add(comboBox_1);
 	    
-	    JComboBox<Integer> comboBox_2 = new JComboBox<Integer>();
+	    comboBox_2 = new JComboBox<Integer>();
 	    comboBox_2.addItem(0);
 	    comboBox_2.addItem(1);
 	    comboBox_2.addItem(2);
@@ -323,7 +330,7 @@ public class Frame {
 	    comboBox_2.addItem(5);
 	    panel_12.add(comboBox_2);
 	    
-	    JComboBox<Integer> comboBox_3 = new JComboBox<Integer>();
+	    comboBox_3 = new JComboBox<Integer>();
 	    comboBox_3.addItem(0);
 	    comboBox_3.addItem(1);
 	    comboBox_3.addItem(2);
@@ -334,7 +341,7 @@ public class Frame {
 	    JLabel lblSensormoduleline = new JLabel("   Sensor (module/line):");
 	    panel_12.add(lblSensormoduleline);
 	    
-	    JComboBox<Integer> comboBox_4 = new JComboBox<Integer>();
+	    comboBox_4 = new JComboBox<Integer>();
 	    comboBox_4.addItem(0);
 	    comboBox_4.addItem(1);
 	    comboBox_4.addItem(2);
@@ -343,7 +350,7 @@ public class Frame {
 	    comboBox_4.addItem(5);
 	    panel_12.add(comboBox_4);
 	    
-	    JComboBox<Integer> comboBox_5 = new JComboBox<Integer>();
+	    comboBox_5 = new JComboBox<Integer>();
 	    comboBox_5.addItem(0);
 	    comboBox_5.addItem(1);
 	    comboBox_5.addItem(2);
@@ -498,9 +505,16 @@ public class Frame {
 			switch (option) {
 			case "general": term = textField_1.getText(); break;
 			case "error type": term = textField_1.getText(); break;  //account for empty/whitespace search field
-			case "location": /*grab the nunio*/; break;
-			case "sensor": /*grab the radar*/; break;
-			case "time range": /*grab and concatenate time*/; break;
+			case "location": term = comboBox_1.getSelectedItem() + "/" + comboBox_2.getSelectedItem() + "/" + comboBox_3.getSelectedItem();
+			case "sensor": term = comboBox_4.getSelectedItem() + "/" + comboBox_5.getSelectedItem(); break;
+			case "time range": 
+				String from = textField_3.getText().trim();
+				String till = textField_4.getText().trim();
+				if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
+					warnLabel.setText("it's wrong");
+				}
+				term = from + "\n" + till; 
+				break;
 			default: System.out.println("wrong 'search by' option");
 			}
 			
@@ -515,6 +529,10 @@ public class Frame {
 		
 	}
 
-	   
+	   private boolean checkDateTimeFormat(String dateTime) {
+		   Pattern p = Pattern.compile("[0-1][1-9]/[0-3][0-9]/[1970-3000] [0-2][0-9]:[0-6][0-9]:[0-6][0-9]");
+		   Matcher m = p.matcher(dateTime);
+		   return m.matches();
+	   }
 
 }
