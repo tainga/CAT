@@ -111,77 +111,6 @@ public class Reader {
 		  
 	}
 	
-	/*
-	// prints all logs to console
-	public void parseAll(String inputDirectory) throws FileNotFoundException {
-		
-		  File dir = new File(inputDirectory);
-		  
-		  File[] directoryListing = dir.listFiles();
-		
-		  if (directoryListing != null) {
-		    for (File log : directoryListing) {
-		      
-		    	if (log.isDirectory() || log.getName().length() < 7) continue;
-		    	
-		    	if (log.getName().substring(0, 7).equals("control")) {
-			    	Scanner reader = new Scanner(log);
-	
-					while (reader.hasNextLine()) {
-						String line = reader.nextLine();
-						System.out.println(line + "\n");
-					}
-					
-					reader.close();
-		    	}
-		    	else continue;
-		    	
-		    }
-		    
-		  } else {
-		    // Handle the case where dir is not really a directory.
-		    // Checking dir.isDirectory() above would not be sufficient
-		    // to avoid race conditions with another process that deletes
-		    // directories.
-		  } 
-	}
-	
-	public void parseAll(String inputDirectory, String outputPath) throws FileNotFoundException {
-		
-		PrintWriter writer = new PrintWriter(outputPath);
-		
-		  File dir = new File(inputDirectory);
-		  File[] directoryListing = dir.listFiles();
-		
-		  if (directoryListing != null) {
-		    for (File log : directoryListing) {
-		      
-		    	if (log.isDirectory() || log.getName().length() < 7) continue;
-		    	
-		    	if (log.getName().substring(0, 7).equals("control")) {
-			    	Scanner reader = new Scanner(log);
-	
-					while (reader.hasNextLine()) {
-						String line = reader.nextLine();
-						writer.println(line + "\n");
-					}
-					
-					reader.close();
-		    	}
-		    	else continue;
-		    	
-		    }
-		    
-		  } else {
-		    // Handle the case where dir is not really a directory.
-		    // Checking dir.isDirectory() above would not be sufficient
-		    // to avoid race conditions with another process that deletes
-		    // directories.
-		  }
-		  writer.close();
-	}
-	*/
-	
 	private static boolean isErrorLine(String line) { 
 		if (line.contains("ERROR")) {
 			return true;
@@ -201,7 +130,6 @@ public class Reader {
 			err = new Error (errorLine);
 		}
 		else {
-			System.out.println("ACHTUNG!!" + "\n" + statLine  + "\n" + errorLine);
 			System.out.println();
 			throw new IllegalArgumentException("Input error");
 			

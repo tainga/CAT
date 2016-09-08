@@ -302,6 +302,8 @@ public class Frame {
 	    textField_1 = new JTextField();
 	    panel_9.add(textField_1);
 	    textField_1.setColumns(16);
+	    
+	    comboBox.addItem("---------------");
 	    comboBox.addItem("general");
 	    comboBox.addItem("error type");
 	    comboBox.addItem("location");
@@ -337,7 +339,6 @@ public class Frame {
 	    comboBox_3.addItem(3);
 	    panel_12.add(comboBox_3);
 
-	    
 	    JLabel lblSensormoduleline = new JLabel("   Sensor (module/line):");
 	    panel_12.add(lblSensormoduleline);
 	    
@@ -381,7 +382,6 @@ public class Frame {
 	    
 	    Component horizontalGlue = Box.createHorizontalGlue();
 	    panel_10.add(horizontalGlue);
-	    //textField_1.setEditable(false);
 	    
 	    JPanel panel_13 = new JPanel();
 	    panel_8.add(panel_13, BorderLayout.SOUTH);
@@ -405,6 +405,9 @@ public class Frame {
 		
 		JLabel lblcopy = new JLabel("\u00a9 2016");
 		panel_3.add(lblcopy);	
+		
+	    comboBox.addActionListener(new SearchOptionListener());
+		lockFields();
 	}
 	
 	class OutputGenerator implements ActionListener {
@@ -484,6 +487,36 @@ public class Frame {
 	    	  if (inputDirectory == null) {
 	    		  warning += "Please select input directory<br>";
 	    	  }
+	    	  
+	    	  String option = (String) comboBox.getSelectedItem();
+	    	  
+	    	  switch (option) {
+	    	  	case "---------------":
+	    	  		warning += "Please select search option<br>";
+	    	  		break;
+				case "general": 
+					if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
+						warning += "Please enter search term<br>";
+					}
+					break;
+				case "error type": 
+					if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
+						warning += "Please enter error type<br>";
+					}; 
+				break;
+				case "time range": 
+					if (textField_3.getText() == null || textField_4.getText() == null) {
+						warning += "Please enter time range<br>";
+						break;
+					}
+					String from = textField_3.getText();
+					String till = textField_4.getText();
+					if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
+						warning += "Incorrect format of time range<br>";
+					}
+					break;
+				//default: System.out.println("wrong 'search by' option");
+				}
 			
 	    	  if (!warning.equals("")) {
 	    		  warning = "<html><div style='text-align:center'>" + warning + "</div></html>";
@@ -499,20 +532,15 @@ public class Frame {
 			
 			Searcher finder = new Searcher();
 			String term = "";
-			String option = (String) comboBox.getSelectedItem();
 			
-			// add graying stuff out, add warnings in each case
 			switch (option) {
 			case "general": term = textField_1.getText(); break;
-			case "error type": term = textField_1.getText(); break;  //account for empty/whitespace search field
+			case "error type": term = textField_1.getText(); break;
 			case "location": term = comboBox_1.getSelectedItem() + "/" + comboBox_2.getSelectedItem() + "/" + comboBox_3.getSelectedItem();
 			case "sensor": term = comboBox_4.getSelectedItem() + "/" + comboBox_5.getSelectedItem(); break;
 			case "time range": 
 				String from = textField_3.getText().trim();
 				String till = textField_4.getText().trim();
-				if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
-					warnLabel.setText("it's wrong");
-				}
 				term = from + "\n" + till; 
 				break;
 			default: System.out.println("wrong 'search by' option");
@@ -524,15 +552,62 @@ public class Frame {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
 		}
-		
+	}
+	
+	class SearchOptionListener implements ActionListener {
+	      public void actionPerformed(ActionEvent e) {
+	    	  
+	    	  lockFields();
+	    	  
+	    	  @SuppressWarnings("unchecked")
+	    	  JComboBox<String> optionBox = (JComboBox<String>)e.getSource();
+              String option = (String)optionBox.getSelectedItem();
+              
+              switch (option) {
+  				case "general": 
+  					textField_1.setEditable(true); 
+  					break;
+  				case "error type": 
+  					textField_1.setEditable(true); 
+  					break;
+  				case "location":
+  					comboBox_1.setEnabled(true);
+  					comboBox_2.setEnabled(true);
+  					comboBox_3.setEnabled(true);
+  					break;
+  				case "sensor": 
+  					comboBox_4.setEnabled(true);
+  					comboBox_5.setEnabled(true);
+  					break;
+  				case "time range": 
+	  				textField_3.setEditable(true);
+	  				textField_4.setEditable(true);
+	  				break;
+  			  }
+	      }
 	}
 
 	   private boolean checkDateTimeFormat(String dateTime) {
-		   Pattern p = Pattern.compile("[0-1][1-9]/[0-3][0-9]/[1970-3000] [0-2][0-9]:[0-6][0-9]:[0-6][0-9]");
+		   Pattern p = Pattern.compile("");//("[1-12]/[1-31]/[1970-3000] [0-24]:[0-59]:[0-59]");
 		   Matcher m = p.matcher(dateTime);
+		   Matcher t = p.matcher("06/27/2016 13:40:46");
+		   System.out.println(t.matches());
 		   return m.matches();
+	   }
+	   
+	   private void lockFields() {
+		   	textField_1.setText("");
+		    textField_1.setEditable(false);
+		    textField_3.setText("");
+		    textField_3.setEditable(false);
+		    textField_4.setText("");
+		    textField_4.setEditable(false);
+		    comboBox_1.setEnabled(false);
+		    comboBox_2.setEnabled(false);
+		    comboBox_3.setEnabled(false);
+		    comboBox_4.setEnabled(false);
+		    comboBox_5.setEnabled(false); 
 	   }
 
 }

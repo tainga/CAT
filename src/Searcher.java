@@ -32,7 +32,6 @@ public class Searcher {
 		      
 		    	if (log.getName().substring(0, 7).equals("control")) {
 		    		String searchTerm = term.trim().toLowerCase();
-			    	//searchGeneral(log, writer, searchTerm, errorsOnly, toTextFile, toConsole);
 		    		switch (searchType) {
 		    			case "general": searchGeneral(log, writer, searchTerm, errorsOnly, toTextFile, toConsole);
 		    			break;
@@ -147,7 +146,6 @@ public class Searcher {
 			else {
 				if (line.contains("ERROR")) { 
 					Error error = Reader.parse(previous, line);
-					System.out.println(term);
 					String[] tmp = term.split("/");
 					String searchedLocation = "Rack " + tmp[0] + ", Module " + tmp[1] + ", Line " + tmp[2];
 					if (error.getLocation().equals(searchedLocation)) {
@@ -181,7 +179,6 @@ public class Searcher {
 			else {
 				if (line.contains("ERROR")) { 
 					Error error = Reader.parse(previous, line);
-					System.out.println(term);
 					String[] tmp = term.split("/");
 					String searchedLocation = "Module " + tmp[0] + ", Line " + tmp[1];
 					if (error.getLocation().contains(searchedLocation)) {
@@ -206,7 +203,6 @@ public class Searcher {
 			String[] tmp = term.split("\n");
 			start = parseDateTime(tmp[0]);
 			finish = parseDateTime(tmp[1]);
-					//System.out.println(start.toString() + " " + finish.toString());
 		} catch (Exception e) {
 			System.out.println("Error parsing date and time: " + term);
 			return;

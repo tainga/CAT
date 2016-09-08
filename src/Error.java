@@ -1,4 +1,3 @@
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -107,14 +106,6 @@ public class Error {
 		else if (msg.contains("sync_rx_parity_errs")) {
 			type = "Parity";
 		}
-		/*
-		else if (msg.contains("guilded lilly:")) {
-			type = "Guilded Lilly";
-		}
-		else if (msg.contains("time out error")) {
-			type = "Time out";
-		}
-		*/
 		else {type = "0";}
 	}	
 	
@@ -126,41 +117,6 @@ public class Error {
 	public String toString() {
 		
 		String output = "";
-		
-		/*
-		// no status line
-		if (type.equals("0") && originalMessage != null && originalStatus == null) {
-			return originalMessage + "\n";
-		}
-		
-		// atypical status or error
-		if ((!blrThreshLocationIsSet || type.equals("0")) && originalMessage != null && originalStatus != null) {
-			return originalStatus + "\n" + originalMessage + "\n";
-		}
-		
-		if (type.equals("idle miss") || type.equals("data loss") || type.equals("parity")) {
-			String aORan = "A";
-			if (type.equals("idle miss")) {aORan += "n";}
-			return aORan + " " + type + " error occurred in " + location + "\nBit loss rate: " + BLR + ", BLR threshold: " + thresh + 
-					"\nDate and time: " + date + " " + time + "\n";
-		}
-		if (type.equals("time out")) {
-			String status = originalStatus.substring(20);
-			int errLocation = originalMessage.indexOf("Time out error.") + 16;
-			String errMsg = originalMessage.substring(errLocation);
-			return "A " + type + " error occurred at " + date + " " + time + "\n" + errMsg + "\n" + status + "\n";
-		}
-		if (type.equals("Guilded Lilly")) {   
-			String status = originalStatus.substring(20);
-			int errLocation = originalMessage.indexOf("Guilded Lilly:") + 15;
-			String errMsg = originalMessage.substring(errLocation);
-			return "A " + type + " error occurred at " + date + " " + time + "\n" + errMsg + "\n" + status + "\n";
-		}
-		
-		else {
-			return ("\n\nAchtung!!!\n\n" + originalStatus + "\n" + originalMessage);  
-		}
-		*/
 		
 		if (date != null) {
 			output += date + " ";
