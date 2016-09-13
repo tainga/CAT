@@ -1,19 +1,14 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Scanner;
-
-import org.omg.Messaging.SyncScopeHelper;
 
 
 public class Reader {
 
 		
 	// prints error report to console
-	public void parseLog(String inputDirectory, boolean errorsOnly) throws FileNotFoundException {
+	public void parseLog(String inputDirectory, PopUp pop, boolean errorsOnly) throws FileNotFoundException {
 		
 		  File dir = new File(inputDirectory);
 		  
@@ -34,7 +29,7 @@ public class Reader {
 						if (errorsOnly) {
 							if (isErrorLine(line)) { 
 								Error error = parse(previous, line);
-								System.out.println(error.toString());
+								pop.addText(error.toString());
 								previous = "";
 							}
 							else {
@@ -42,7 +37,7 @@ public class Reader {
 							}
 						}
 						else {
-							System.out.println(line);
+							pop.addText(line);
 						}
 					}
 					
@@ -53,10 +48,7 @@ public class Reader {
 		    }
 		    
 		  } else {
-		    // Handle the case where dir is not really a directory.
-		    // Checking dir.isDirectory() above would not be sufficient
-		    // to avoid race conditions with another process that deletes
-		    // directories.
+			  pop.addText("Directory not found. Please make sure that the directory you specified is really a directory.");
 		  }  
 	}
 	
@@ -102,10 +94,7 @@ public class Reader {
 		    }
 		    
 		  } else {
-		    // Handle the case where dir is not really a directory.
-		    // Checking dir.isDirectory() above would not be sufficient
-		    // to avoid race conditions with another process that deletes
-		    // directories.
+				System.out.println("Directory not found. Please make sure that the directory you specified is really a directory.");
 		  }
 		  writer.close();
 		  

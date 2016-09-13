@@ -2,52 +2,30 @@ import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-
 import java.awt.GridLayout;
 import javax.swing.JRadioButton;
 import javax.swing.border.LineBorder;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-
-import javax.print.DocFlavor.URL;
 import javax.swing.Box;
 import javax.swing.JTextField;
-import java.awt.GridBagLayout;
 import java.awt.FlowLayout;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import java.awt.CardLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
-
-import net.miginfocom.swing.MigLayout;
-import javax.swing.SpringLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JCheckBox;
-import javax.swing.JTextPane;
-import javax.swing.JTextArea;
 import java.awt.SystemColor;
 
 public class Frame {
@@ -188,7 +166,7 @@ public class Frame {
 	    panel_1.add(panel_5);
 	    
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fc.setCurrentDirectory(new File("C:\\Users\\anastasia taing\\Desktop\\CGW project\\example save crash\\vpsSYS2_27Jun2016_12_27_25_cgw1e\\CGWLOGS\\control"));
+		fc.setCurrentDirectory(new File("C:\\Users\\Anastasia Taing\\Desktop\\CGW project\\example save crash\\chaSYS1_20Jul2016_13_18_17_cgw1f\\CGWLOGS\\control"));
 	    panel_5.setLayout(new GridLayout(2,0));
 	    
 	    JPanel panel_15 = new JPanel();
@@ -224,8 +202,7 @@ public class Frame {
 	    JPanel panel_16 = new JPanel();
 	    panel_5.add(panel_16);
 	    panel_16.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-	    
-	    
+	     
 	    // Output Folder - Button & JFileChooser
 	    JButton btnOutputFolder = new JButton("Output folder");
 	    btnOutputFolder.setPreferredSize(new Dimension(150, 23));
@@ -446,11 +423,11 @@ public class Frame {
 	    	  Reader reader = new Reader();
 
 	    		if (chckbxToConsole.isSelected()) {
+	    			PopUp pop = popup();
 	    			try {
-						reader.parseLog(inputDirectory, rdbtnErrorsOnly.isSelected());
+						reader.parseLog(inputDirectory, pop, rdbtnErrorsOnly.isSelected());
 					} catch (FileNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						System.out.println("Something went terrribly wrong. Sorry about that.");
 					}
 		    	}
 		    	  
@@ -458,8 +435,7 @@ public class Frame {
 		    		try {
 						reader.parseLog(inputDirectory, outputDirectory, rdbtnErrorsOnly.isSelected());
 					} catch (FileNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						System.out.println("Something went terrribly wrong. Sorry about that.");
 					}
 		    	}
 	      }
@@ -515,7 +491,6 @@ public class Frame {
 						warning += "Incorrect format of time range<br>";
 					}
 					break;
-				//default: System.out.println("wrong 'search by' option");
 				}
 			
 	    	  if (!warning.equals("")) {
@@ -529,28 +504,31 @@ public class Frame {
 			    outputDirectory = fc.getSelectedFile().getAbsolutePath();
 				outputDirectory += "\\CAT " + dateTime + ".txt";
 		    }
-			
+	    	PopUp pop = null;
+			if (chckbxToConsole.isSelected()) {
+				pop = popup();
+			}
+	    	
 			Searcher finder = new Searcher();
 			String term = "";
 			
 			switch (option) {
 			case "general": term = textField_1.getText(); break;
 			case "error type": term = textField_1.getText(); break;
-			case "location": term = comboBox_1.getSelectedItem() + "/" + comboBox_2.getSelectedItem() + "/" + comboBox_3.getSelectedItem();
+			case "location": term = comboBox_1.getSelectedItem() + "/" + comboBox_2.getSelectedItem() + "/" + comboBox_3.getSelectedItem(); break;
 			case "sensor": term = comboBox_4.getSelectedItem() + "/" + comboBox_5.getSelectedItem(); break;
 			case "time range": 
 				String from = textField_3.getText().trim();
 				String till = textField_4.getText().trim();
 				term = from + "\n" + till; 
 				break;
-			default: System.out.println("wrong 'search by' option");
+			default: System.out.println("Wrong 'search by' option");
 			}
 			
 			try {
-				finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected());
+				finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
 			} catch (FileNotFoundException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				System.out.println("Something went terrribly wrong. Sorry about that.");
 			}
 		}
 	}
@@ -589,11 +567,19 @@ public class Frame {
 	}
 
 	   private boolean checkDateTimeFormat(String dateTime) {
-		   Pattern p = Pattern.compile("");//("[1-12]/[1-31]/[1970-3000] [0-24]:[0-59]:[0-59]");
-		   Matcher m = p.matcher(dateTime);
-		   Matcher t = p.matcher("06/27/2016 13:40:46");
-		   System.out.println(t.matches());
-		   return m.matches();
+
+		    String re1="(\\d+)";	// Integer Number 1
+		    String re2="(\\/)";	// Any Single Character 1
+		    String re3="((?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])";	// Day 1
+		    String re4="(\\/)";	// Any Single Character 2
+		    String re5="((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])";	// Year 1
+		    String re6="( )";	// White Space 1
+		    String re7="((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)";	// HourMinuteSec 1
+
+		    Pattern p = Pattern.compile(re1+re2+re3+re4+re5+re6+re7,Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+		    Matcher m = p.matcher(dateTime);
+
+		    return m.matches();
 	   }
 	   
 	   private void lockFields() {
@@ -608,6 +594,21 @@ public class Frame {
 		    comboBox_3.setEnabled(false);
 		    comboBox_4.setEnabled(false);
 		    comboBox_5.setEnabled(false); 
+	   }
+	   
+	   private PopUp popup() {
+		   PopUp frame = null;
+					try {
+						frame = new PopUp();
+						frame.setVisible(true);
+						java.net.URL iconURL = getClass().getResource("cat-paw.png");
+						ImageIcon icon = new ImageIcon(iconURL);
+						frame.setIconImage(icon.getImage());
+					
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+			return frame;
 	   }
 
 }

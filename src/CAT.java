@@ -1,13 +1,11 @@
 import java.awt.EventQueue;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
 
-public class Test {
+public class CAT {
 		
 		/**
 		 * Launch the application.
 		 */
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -19,6 +17,8 @@ public class Test {
 				}
 			}
 		});
+
 	}
 
+		
 }

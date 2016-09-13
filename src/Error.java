@@ -6,7 +6,7 @@ public class Error {
 	
 	private String originalMessage;
 	private String originalStatus;
-	private String date;  //change to Date, maybe
+	private String date;
 	private String time;
 	private double BLR;
 	private double thresh;
@@ -45,9 +45,8 @@ public class Error {
 	}
 		
 	private void parseOriginalMessage(String statusLine, String errorLine) {
-		String[] splitLine1 = statusLine.split(" ");
-		String[] splitLine2 = errorLine.split(" ");
 		
+		String[] splitLine2 = errorLine.split(" ");
 		
 		try {
 			this.date = splitLine2[0];
@@ -60,7 +59,6 @@ public class Error {
 		
 			int blrLocation = statusLine.indexOf("BLR=");
 			if (blrLocation != -1) {
-				//System.out.println(statusLine);
 				String sub = statusLine.substring(blrLocation + 4);
 				this.BLR = Double.parseDouble(sub.split(" ")[0]);
 			}
