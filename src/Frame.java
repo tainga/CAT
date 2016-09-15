@@ -74,11 +74,11 @@ public class Frame {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		/*
+		
 		java.net.URL iconURL = getClass().getResource("cat-paw.png");
 		ImageIcon icon = new ImageIcon(iconURL);
 		frame.setIconImage(icon.getImage());
-		*/
+		
 		JPanel panel = new JPanel();
 		frame.getContentPane().add(panel, BorderLayout.NORTH);
 		
@@ -601,11 +601,10 @@ public class Frame {
 					try {
 						frame = new PopUp();
 						frame.setVisible(true);
-						/*
+						
 						java.net.URL iconURL = getClass().getResource("cat-paw.png");
 						ImageIcon icon = new ImageIcon(iconURL);
 						frame.setIconImage(icon.getImage());
-						*/
 					
 					} catch (Exception e) {
 						e.printStackTrace();
