@@ -1,9 +1,9 @@
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.JTextPane;
 
 public class PopUp extends JFrame {
 
@@ -12,7 +12,8 @@ public class PopUp extends JFrame {
 	 */
 	private static final long serialVersionUID = -6559673435200505582L;
 	private JPanel contentPane;
-	private JTextPane textPane;
+	private JTextArea textArea;
+	private JScrollPane jsp;
 
 	/**
 	 * Create the frame.
@@ -25,17 +26,23 @@ public class PopUp extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
-		textPane = new JTextPane();
-		textPane.setEditable(false);
-		contentPane.add(textPane, BorderLayout.CENTER);
+		textArea = new JTextArea();
+		jsp = new JScrollPane(textArea);
+		jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		textArea.setEditable(false);
+		
+		contentPane.add(textArea, BorderLayout.CENTER);
+		contentPane.add(jsp, BorderLayout.EAST);
+		
+		contentPane.revalidate();
+		contentPane.repaint();
+		
 	}
 	
 	public void addText(String text) {
-		try {
-			textPane.getStyledDocument().insertString(0, text + "\n", null);
-		} catch (BadLocationException e) {
-			e.printStackTrace();
-		}
+		//StyledDocument doc = textPane.getStyledDocument();
+		//doc.insertString(0, text + "\n", null);
+		textArea.append(text + "\n");
 	}
 
 }

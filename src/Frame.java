@@ -605,7 +605,7 @@ public class Frame {
 						java.net.URL iconURL = getClass().getResource("cat-paw.png");
 						ImageIcon icon = new ImageIcon(iconURL);
 						frame.setIconImage(icon.getImage());
-					
+						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
