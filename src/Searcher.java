@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 public class Searcher {
 
+	private static String brk = System.lineSeparator();
 	
 	public void search(String searchType, String inputDirectory, String outputDirectory, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
 		
@@ -67,15 +68,20 @@ public class Searcher {
 			
 			if (!errorsOnly) {
 				if (lowerCaseLine.contains(term)) {
-					if (toConsole) pop.addText(line + "\n");
-					if (writer != null) writer.println(line + "\n"); 
+					if (!previous.equals("")) previous += brk;
+					if (toConsole) pop.addText(previous + line + brk + brk);
+					if (writer != null) writer.println(previous + line + brk); 				
+				previous = "";
+				}
+				else {
+					previous = line;
 				}
 			}
 			else {
 				if (line.contains("ERROR")) { 
 					Error error = Reader.parse(previous, line);
 					if (error.contains(term)) {
-						if (toConsole) pop.addText(error.toString() + "\n");
+						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";
@@ -103,8 +109,8 @@ public class Searcher {
 			
 			if (!errorsOnly) {
 				if (lowerCaseLine.contains(term)) {
-					if (toConsole) pop.addText(line + "\n");
-					if (writer != null) writer.println(line + "\n"); 
+					if (toConsole) pop.addText(line + brk);
+					if (writer != null) writer.println(line + brk); 
 				}
 			}
 			else {
@@ -112,7 +118,7 @@ public class Searcher {
 					Error error = Reader.parse(previous, line);
 					
 					if (error.getType().toLowerCase().equals(term)) {
-						if (toConsole) pop.addText(error.toString() + "\n");
+						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";
@@ -135,8 +141,8 @@ public class Searcher {
 			
 			if (!errorsOnly) {
 				if (lowerCaseLine.contains(term)) {
-					if (toConsole) pop.addText(line + "\n");
-					if (writer != null) writer.println(line + "\n"); 
+					if (toConsole) pop.addText(line + brk);
+					if (writer != null) writer.println(line + brk); 
 				}
 			}
 			else {
@@ -145,7 +151,7 @@ public class Searcher {
 					String[] tmp = term.split("/");
 					String searchedLocation = "Rack " + tmp[0] + ", Module " + tmp[1] + ", Line " + tmp[2];
 					if (error.getLocation().equals(searchedLocation)) {
-						if (toConsole) pop.addText(error.toString() + "\n");
+						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";
@@ -168,8 +174,8 @@ public class Searcher {
 			
 			if (!errorsOnly) {
 				if (lowerCaseLine.contains(term)) {
-					if (toConsole) pop.addText(line + "\n");
-					if (writer != null) writer.println(line + "\n"); 
+					if (toConsole) pop.addText(line + brk);
+					if (writer != null) writer.println(line + brk); 
 				}
 			}
 			else {
@@ -178,7 +184,7 @@ public class Searcher {
 					String[] tmp = term.split("/");
 					String searchedLocation = "Module " + tmp[0] + ", Line " + tmp[1];
 					if (error.getLocation().contains(searchedLocation)) {
-						if (toConsole) pop.addText(error.toString() + "\n");
+						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";
@@ -222,8 +228,8 @@ public class Searcher {
 					continue;														// maybe handle this better
 				}
 				if (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0) {
-					if (toConsole) pop.addText(line + "\n");
-					if (writer != null) writer.println(line + "\n"); 
+					if (toConsole) pop.addText(line + brk);
+					if (writer != null) writer.println(line + brk); 
 				}
 			}
 			else {
@@ -231,7 +237,7 @@ public class Searcher {
 					Error error = Reader.parse(previous, line);
 					GregorianCalendar lineDateTime = error.getDateTime();
 					if (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0) {
-						if (toConsole) pop.addText(error.toString() + "\n");
+						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";

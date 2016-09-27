@@ -30,6 +30,7 @@ public class PopUp extends JFrame {
 		jsp = new JScrollPane(textArea);
 		
 		textArea.setEditable(false);
+		textArea.setLineWrap(true);
 		
 		//contentPane.add(textArea, BorderLayout.CENTER);
 		contentPane.add(jsp);

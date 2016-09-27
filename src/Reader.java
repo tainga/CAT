@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 public class Reader {
 
+	private static String brk = System.lineSeparator();
 		
 	// prints error report to console
 	public void parseLog(String inputDirectory, PopUp pop, boolean errorsOnly) throws FileNotFoundException {
@@ -29,7 +30,7 @@ public class Reader {
 						if (errorsOnly) {
 							if (isErrorLine(line)) { 
 								Error error = parse(previous, line);
-								pop.addText(error.toString() + "\n");
+								pop.addText(error.toString() + brk);
 								previous = "";
 							}
 							else {
@@ -37,7 +38,7 @@ public class Reader {
 							}
 						}
 						else {
-							pop.addText(line + "\n");
+							pop.addText(line + brk);
 						}
 					}
 					
@@ -75,7 +76,7 @@ public class Reader {
 						if (errorsOnly) {
 							if (isErrorLine(line)) {
 								Error error = parse(previous, line);
-								writer.println(error.toString() + "\n");
+								writer.println(error.toString() + brk);
 								previous = "";
 							} 
 							else {
@@ -83,7 +84,7 @@ public class Reader {
 							} 
 						}
 						else {
-							writer.println(line + "\n");
+							writer.println(line + brk);
 						}
 					}
 					

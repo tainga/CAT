@@ -13,10 +13,12 @@ public class Error {
 	private String type;
 	private String location;
 	private boolean blrThreshLocationIsSet;
+	private String brk = System.lineSeparator();
 	
 	public Error (String statusLine, String errorLine) {
 		originalMessage = errorLine;
 		originalStatus = statusLine;
+		
 		// initializes date and time
 		parseDatetime(errorLine);
 		// initializes BLR, thresh, location, blrThreshLocationIsSet
@@ -40,7 +42,7 @@ public class Error {
 			this.time = split[1];
 
 		} catch (Exception e) {
-			System.out.println("Error parsing date and time in line:\n" + errorLine);
+			System.out.println("Error parsing date and time in line:" + brk + errorLine);
 		}	
 	}
 		
@@ -54,7 +56,7 @@ public class Error {
 		} 
 		catch (Exception e) {
 
-			System.out.println("Error parsing date and time in line:\n" + errorLine);
+			System.out.println("Error parsing date and time in line:" + brk + errorLine);
 		}
 		
 			int blrLocation = statusLine.indexOf("BLR=");
@@ -130,7 +132,7 @@ public class Error {
 		}
 		if (Double.compare(BLR, thresh) > 0) {
 			if (BLR > -1) {
-				output += "\nBit loss rate: " + BLR + " ";
+				output += brk + "Bit loss rate: " + BLR + " ";
 			}
 			if (thresh > -1) {
 				output += "BLR threshold: " + thresh;
@@ -139,21 +141,21 @@ public class Error {
 		if (!blrThreshLocationIsSet) {
 			if (type.equals("Idle miss") || type.equals("Data loss") || type.equals("Parity")) {
 				if (originalStatus != null) {
-					output +=  "\n" + originalStatus;
+					output +=  brk + originalStatus;
 				}
 				else {
-					output +=  "\n" + originalMessage;
+					output +=  brk + originalMessage;
 				}
 			}
 			else {
 				output += "Error: " + parseErrorMsg(originalMessage);
 					if (originalStatus != null) {
-						output +=  "\n" + originalStatus;
+						output +=  brk + originalStatus;
 					}
 			}
 		}
 		
-		output += "\n";
+		output += brk;
 		
 		return output;
 		
