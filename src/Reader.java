@@ -29,7 +29,7 @@ public class Reader {
 						if (errorsOnly) {
 							if (isErrorLine(line)) { 
 								Error error = parse(previous, line);
-								pop.addText(error.toString());
+								pop.addText(error.toString() + "\n");
 								previous = "";
 							}
 							else {
@@ -37,7 +37,7 @@ public class Reader {
 							}
 						}
 						else {
-							pop.addText(line);
+							pop.addText(line + "\n");
 						}
 					}
 					
@@ -75,7 +75,7 @@ public class Reader {
 						if (errorsOnly) {
 							if (isErrorLine(line)) {
 								Error error = parse(previous, line);
-								writer.println(error.toString());
+								writer.println(error.toString() + "\n");
 								previous = "";
 							} 
 							else {
@@ -83,7 +83,7 @@ public class Reader {
 							} 
 						}
 						else {
-							writer.println(line);
+							writer.println(line + "\n");
 						}
 					}
 					

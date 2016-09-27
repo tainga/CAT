@@ -67,15 +67,15 @@ public class Searcher {
 			
 			if (!errorsOnly) {
 				if (lowerCaseLine.contains(term)) {
-					if (toConsole) pop.addText(line);
-					if (writer != null) writer.println(line); 
+					if (toConsole) pop.addText(line + "\n");
+					if (writer != null) writer.println(line + "\n"); 
 				}
 			}
 			else {
 				if (line.contains("ERROR")) { 
 					Error error = Reader.parse(previous, line);
 					if (error.contains(term)) {
-						if (toConsole) pop.addText(error.toString());
+						if (toConsole) pop.addText(error.toString() + "\n");
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";
@@ -103,8 +103,8 @@ public class Searcher {
 			
 			if (!errorsOnly) {
 				if (lowerCaseLine.contains(term)) {
-					if (toConsole) pop.addText(line);
-					if (writer != null) writer.println(line); 
+					if (toConsole) pop.addText(line + "\n");
+					if (writer != null) writer.println(line + "\n"); 
 				}
 			}
 			else {
@@ -112,7 +112,7 @@ public class Searcher {
 					Error error = Reader.parse(previous, line);
 					
 					if (error.getType().toLowerCase().equals(term)) {
-						if (toConsole) pop.addText(error.toString());
+						if (toConsole) pop.addText(error.toString() + "\n");
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";
@@ -135,8 +135,8 @@ public class Searcher {
 			
 			if (!errorsOnly) {
 				if (lowerCaseLine.contains(term)) {
-					if (toConsole) pop.addText(line);
-					if (writer != null) writer.println(line); 
+					if (toConsole) pop.addText(line + "\n");
+					if (writer != null) writer.println(line + "\n"); 
 				}
 			}
 			else {
@@ -145,7 +145,7 @@ public class Searcher {
 					String[] tmp = term.split("/");
 					String searchedLocation = "Rack " + tmp[0] + ", Module " + tmp[1] + ", Line " + tmp[2];
 					if (error.getLocation().equals(searchedLocation)) {
-						if (toConsole) pop.addText(error.toString());
+						if (toConsole) pop.addText(error.toString() + "\n");
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";
@@ -168,8 +168,8 @@ public class Searcher {
 			
 			if (!errorsOnly) {
 				if (lowerCaseLine.contains(term)) {
-					if (toConsole) pop.addText(line);
-					if (writer != null) writer.println(line); 
+					if (toConsole) pop.addText(line + "\n");
+					if (writer != null) writer.println(line + "\n"); 
 				}
 			}
 			else {
@@ -178,7 +178,7 @@ public class Searcher {
 					String[] tmp = term.split("/");
 					String searchedLocation = "Module " + tmp[0] + ", Line " + tmp[1];
 					if (error.getLocation().contains(searchedLocation)) {
-						if (toConsole) pop.addText(error.toString());
+						if (toConsole) pop.addText(error.toString() + "\n");
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";
@@ -222,8 +222,8 @@ public class Searcher {
 					continue;														// maybe handle this better
 				}
 				if (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0) {
-					if (toConsole) pop.addText(line);
-					if (writer != null) writer.println(line); 
+					if (toConsole) pop.addText(line + "\n");
+					if (writer != null) writer.println(line + "\n"); 
 				}
 			}
 			else {
@@ -231,7 +231,7 @@ public class Searcher {
 					Error error = Reader.parse(previous, line);
 					GregorianCalendar lineDateTime = error.getDateTime();
 					if (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0) {
-						if (toConsole) pop.addText(error.toString());
+						if (toConsole) pop.addText(error.toString() + "\n");
 						if (writer != null) writer.println(error.toString());
 					}
 					previous = "";

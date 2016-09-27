@@ -55,6 +55,7 @@ public class Frame {
 	private JComboBox<Integer> comboBox_3;
 	private JComboBox<Integer> comboBox_4;
 	private JComboBox<Integer> comboBox_5;
+	private JComboBox<String> comboBox_6;
 
 
 	/**
@@ -270,22 +271,36 @@ public class Frame {
 	    comboBox = new JComboBox<String>();
 	    panel_9.add(comboBox);
 	    
-	    Component horizontalStrut = Box.createHorizontalStrut(20);
-	    panel_9.add(horizontalStrut);
-	    
-	    JLabel lblEnterSearchTerm = new JLabel("    Search term / error:");
-	    panel_9.add(lblEnterSearchTerm);
-	    
-	    textField_1 = new JTextField();
-	    panel_9.add(textField_1);
-	    textField_1.setColumns(16);
-	    
 	    comboBox.addItem("---------------");
 	    comboBox.addItem("general");
 	    comboBox.addItem("error type");
 	    comboBox.addItem("location");
 	    comboBox.addItem("sensor");
 	    comboBox.addItem("time range");
+	    
+	    JPanel panel_19 = new JPanel();
+	    FlowLayout flowLayout = (FlowLayout) panel_19.getLayout();
+	    flowLayout.setAlignment(FlowLayout.LEFT);
+	    panel_14.add(panel_19);
+	    
+	    JLabel lblEnterSearchTerm = new JLabel("Search term:");
+	    panel_19.add(lblEnterSearchTerm);
+	    
+	    textField_1 = new JTextField();
+	    panel_19.add(textField_1);
+	    textField_1.setColumns(16);
+	    
+	    Component horizontalStrut = Box.createHorizontalStrut(20);
+	    panel_19.add(horizontalStrut);
+	    
+	    JLabel lblError = new JLabel("Error:");
+	    panel_19.add(lblError);
+	    
+	    comboBox_6 = new JComboBox<String>();
+	    comboBox_6.addItem("data loss");
+	    comboBox_6.addItem("idle miss");
+	    comboBox_6.addItem("parity");
+	    panel_19.add(comboBox_6);
 	    
 	    JPanel panel_12 = new JPanel();
 	    panel_14.add(panel_12);
@@ -476,9 +491,11 @@ public class Frame {
 					}
 					break;
 				case "error type": 
+					/*
 					if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
 						warning += "Please enter error type<br>";
 					}; 
+					*/
 				break;
 				case "time range": 
 					if (textField_3.getText() == null || textField_4.getText() == null) {
@@ -514,7 +531,7 @@ public class Frame {
 			
 			switch (option) {
 			case "general": term = textField_1.getText(); break;
-			case "error type": term = textField_1.getText(); break;
+			case "error type": term = comboBox_6.getSelectedItem() + ""; break;
 			case "location": term = comboBox_1.getSelectedItem() + "/" + comboBox_2.getSelectedItem() + "/" + comboBox_3.getSelectedItem(); break;
 			case "sensor": term = comboBox_4.getSelectedItem() + "/" + comboBox_5.getSelectedItem(); break;
 			case "time range": 
@@ -547,7 +564,7 @@ public class Frame {
   					textField_1.setEditable(true); 
   					break;
   				case "error type": 
-  					textField_1.setEditable(true); 
+  					comboBox_6.setEnabled(true); 
   					break;
   				case "location":
   					comboBox_1.setEnabled(true);
@@ -594,6 +611,7 @@ public class Frame {
 		    comboBox_3.setEnabled(false);
 		    comboBox_4.setEnabled(false);
 		    comboBox_5.setEnabled(false); 
+		    comboBox_6.setEnabled(false);
 	   }
 	   
 	   private PopUp popup() {

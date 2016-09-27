@@ -28,11 +28,11 @@ public class PopUp extends JFrame {
 		
 		textArea = new JTextArea();
 		jsp = new JScrollPane(textArea);
-		jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		
 		textArea.setEditable(false);
 		
-		contentPane.add(textArea, BorderLayout.CENTER);
-		contentPane.add(jsp, BorderLayout.EAST);
+		//contentPane.add(textArea, BorderLayout.CENTER);
+		contentPane.add(jsp);
 		
 		contentPane.revalidate();
 		contentPane.repaint();
@@ -42,7 +42,7 @@ public class PopUp extends JFrame {
 	public void addText(String text) {
 		//StyledDocument doc = textPane.getStyledDocument();
 		//doc.insertString(0, text + "\n", null);
-		textArea.append(text + "\n");
+		textArea.append(text);
 	}
 
 }
