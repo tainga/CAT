@@ -1,4 +1,6 @@
 import java.awt.BorderLayout;
+import java.awt.Insets;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -20,7 +22,7 @@ public class PopUp extends JFrame {
 	 */
 	public PopUp() {
 		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(110, 110, 700, 800);
+		setBounds(700, 110, 700, 800);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -31,6 +33,7 @@ public class PopUp extends JFrame {
 		
 		textArea.setEditable(false);
 		textArea.setLineWrap(true);
+		textArea.setMargin(new Insets(10,10,10,10));
 		
 		//contentPane.add(textArea, BorderLayout.CENTER);
 		contentPane.add(jsp);

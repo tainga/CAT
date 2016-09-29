@@ -8,20 +8,22 @@ public class Searcher {
 
 	private static String brk = System.lineSeparator();
 	
-	public void search(String searchType, String inputDirectory, String outputDirectory, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+	public int search(String searchType, String inputDirectory, String outputDirectory, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
 		
 		File dir = new File(inputDirectory);
-		PrintWriter writer = null;
+		PrintWriter writer = null;					// do something about null pops
 		
 		if (toTextFile && (outputDirectory == null || outputDirectory.isEmpty())) {
 			pop.addText("No output directory!");
-			return;
+			return -3;
 		}
 		
 		if (toTextFile && outputDirectory != null && !outputDirectory.isEmpty()) {
 			File output = new File(outputDirectory);
 			writer = new PrintWriter(output);
 		}
+		
+		int numberOfRecordsFound = 0;
 		
 		  File[] directoryListing = dir.listFiles();
 		
@@ -33,15 +35,15 @@ public class Searcher {
 		    	if (log.getName().substring(0, 7).equals("control")) {
 		    		String searchTerm = term.trim().toLowerCase();
 		    		switch (searchType) {
-		    			case "general": searchGeneral(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
+		    			case "general": numberOfRecordsFound += searchGeneral(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
 		    			break;
-		    			case "error type": searchType(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
+		    			case "error type": numberOfRecordsFound += searchType(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
 		    			break;
-		    			case "location": searchLocation(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
+		    			case "location": numberOfRecordsFound += searchLocation(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
 		    			break;
-		    			case "sensor": searchSensor(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
+		    			case "sensor": numberOfRecordsFound += searchSensor(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
 		    			break;
-		    			case "time range": searchTime(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
+		    			case "time range": numberOfRecordsFound += searchTime(log, writer, searchTerm, errorsOnly, toTextFile, toConsole, pop);
 		    			break;
 		    			default: pop.addText("Wrong searchType: " + searchType);
 		    			break;
@@ -56,11 +58,16 @@ public class Searcher {
 		  }  
 		  
 		  if (writer != null) writer.close();
+		  
+		  return numberOfRecordsFound;
 	}
 	
-	public void searchGeneral(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+	public int searchGeneral(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+		
 		Scanner reader = new Scanner(log);
 		String previous = "";
+		
+		int recordCounter = 0;
 
 		while (reader.hasNextLine()) {
 			String line = reader.nextLine();
@@ -70,7 +77,8 @@ public class Searcher {
 				if (lowerCaseLine.contains(term)) {
 					if (!previous.equals("")) previous += brk;
 					if (toConsole) pop.addText(previous + line + brk + brk);
-					if (writer != null) writer.println(previous + line + brk); 				
+					if (writer != null) writer.println(previous + line + brk); 	
+					recordCounter++;
 				previous = "";
 				}
 				else {
@@ -83,6 +91,7 @@ public class Searcher {
 					if (error.contains(term)) {
 						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
+						recordCounter++;
 					}
 					previous = "";
 				}
@@ -92,16 +101,16 @@ public class Searcher {
 			}
 		}
 		reader.close();
+
+		return recordCounter;
 	}
 	
-	public void searchType(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
-		if (!(term.equals("parity") || term.equals("data loss") || term.equals("idle miss"))) {
-			searchGeneral(log, writer, term, errorsOnly, toTextFile, toConsole, pop);
-			return;
-		}
+	public int searchType(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
 		
 		Scanner reader = new Scanner(log);
 		String previous = "";
+		
+		int recordCounter = 0;
 
 		while (reader.hasNextLine()) {
 			String line = reader.nextLine();
@@ -111,6 +120,7 @@ public class Searcher {
 				if (lowerCaseLine.contains(term)) {
 					if (toConsole) pop.addText(line + brk);
 					if (writer != null) writer.println(line + brk); 
+					recordCounter++;
 				}
 			}
 			else {
@@ -120,6 +130,7 @@ public class Searcher {
 					if (error.getType().toLowerCase().equals(term)) {
 						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
+						recordCounter++;
 					}
 					previous = "";
 				}
@@ -129,11 +140,16 @@ public class Searcher {
 			}
 		}
 		reader.close();
+		
+		return recordCounter;
 	}
 	
-	public void searchLocation(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+	public int searchLocation(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+		
 		Scanner reader = new Scanner(log);
 		String previous = "";
+		
+		int recordCounter = 0;
 
 		while (reader.hasNextLine()) {
 			String line = reader.nextLine();
@@ -143,6 +159,7 @@ public class Searcher {
 				if (lowerCaseLine.contains(term)) {
 					if (toConsole) pop.addText(line + brk);
 					if (writer != null) writer.println(line + brk); 
+					recordCounter++;
 				}
 			}
 			else {
@@ -153,6 +170,7 @@ public class Searcher {
 					if (error.getLocation().equals(searchedLocation)) {
 						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
+						recordCounter++;
 					}
 					previous = "";
 				}
@@ -162,11 +180,16 @@ public class Searcher {
 			}
 		}
 		reader.close();
+		
+		return recordCounter;
 	}
 	
-	public void searchSensor(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+	public int searchSensor(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+		
 		Scanner reader = new Scanner(log);
 		String previous = "";
+		
+		int recordCounter = 0;
 
 		while (reader.hasNextLine()) {
 			String line = reader.nextLine();
@@ -176,6 +199,7 @@ public class Searcher {
 				if (lowerCaseLine.contains(term)) {
 					if (toConsole) pop.addText(line + brk);
 					if (writer != null) writer.println(line + brk); 
+					recordCounter++;
 				}
 			}
 			else {
@@ -186,6 +210,7 @@ public class Searcher {
 					if (error.getLocation().contains(searchedLocation)) {
 						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
+						recordCounter++;
 					}
 					previous = "";
 				}
@@ -195,10 +220,12 @@ public class Searcher {
 			}
 		}
 		reader.close();
+		
+		return recordCounter;
 	}
 	
 
-	public void searchTime(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+	public int searchTime(File log, PrintWriter writer, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
 		GregorianCalendar start = null;
 		GregorianCalendar finish = null;
 		try {
@@ -206,12 +233,14 @@ public class Searcher {
 			start = parseDateTime(tmp[0]);
 			finish = parseDateTime(tmp[1]);
 		} catch (Exception e) {
-			pop.addText("Error parsing date and time: " + term);
-			return;
+			System.out.println("Error parsing date and time: " + term);
+			return -1;
 		}
 		
 		Scanner reader = new Scanner(log);
 		String previous = "";
+		
+		int recordCounter = 0;
 
 		while (reader.hasNextLine()) {
 			String line = reader.nextLine();
@@ -230,6 +259,7 @@ public class Searcher {
 				if (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0) {
 					if (toConsole) pop.addText(line + brk);
 					if (writer != null) writer.println(line + brk); 
+					recordCounter++;
 				}
 			}
 			else {
@@ -239,6 +269,7 @@ public class Searcher {
 					if (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0) {
 						if (toConsole) pop.addText(error.toString() + brk);
 						if (writer != null) writer.println(error.toString());
+						recordCounter++;
 					}
 					previous = "";
 				}
@@ -248,6 +279,8 @@ public class Searcher {
 			}
 		}
 		reader.close();
+		
+		return recordCounter;
 	
 	}
 	

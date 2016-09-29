@@ -287,8 +287,9 @@ public class Frame {
 	    panel_19.add(lblEnterSearchTerm);
 	    
 	    textField_1 = new JTextField();
-	    panel_19.add(textField_1);
 	    textField_1.setColumns(16);
+	    textField_1.addActionListener(new SearchListener());
+	    panel_19.add(textField_1);
 	    
 	    Component horizontalStrut = Box.createHorizontalStrut(20);
 	    panel_19.add(horizontalStrut);
@@ -365,8 +366,9 @@ public class Frame {
 	    panel_10.add(lblTo);
 	    
 	    textField_4 = new JTextField();
-	    panel_10.add(textField_4);
 	    textField_4.setColumns(10);
+	    textField_4.addActionListener(new SearchListener());
+	    panel_10.add(textField_4);
 	    
 	    JLabel lblEx = new JLabel("ex.: 6/27/2016 13:40:46");
 	    lblEx.setForeground(SystemColor.windowBorder);
@@ -389,7 +391,7 @@ public class Frame {
 	    panel_1.add(panel_17);
 	    
 	    warnLabel = new JLabel("");
-	    warnLabel.setForeground(Color.red);
+	    //warnLabel.setForeground(Color.red);
 	    panel_17.add(warnLabel);
 		
 		JPanel panel_3 = new JPanel();
@@ -424,7 +426,7 @@ public class Frame {
 	    	  }
 			
 	    	  if (!warning.equals("")) {
-	    		  warning = "<html><div style='text-align:center'>" + warning + "</div></html>";
+	    		  warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
 	    		  warnLabel.setText(warning);
 	    		  return;
 	    	  }
@@ -511,7 +513,7 @@ public class Frame {
 				}
 			
 	    	  if (!warning.equals("")) {
-	    		  warning = "<html><div style='text-align:center'>" + warning + "</div></html>";
+	    		  warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
 	    		  warnLabel.setText(warning);
 	    		  return;
 	    	  }
@@ -542,10 +544,29 @@ public class Frame {
 			default: System.out.println("Wrong 'search by' option");
 			}
 			
+			int numberOfEntries = -4;
+			
 			try {
-				finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
+				numberOfEntries = finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
 			} catch (FileNotFoundException e1) {
 				System.out.println("Something went terrribly wrong. Sorry about that.");
+			}
+			
+			if (numberOfEntries == 0) {
+				if (pop != null) {
+					pop.setVisible(false);
+					pop.dispose();
+				}
+				if (chckbxToTextFile.isSelected()) {
+					File fl = new File(outputDirectory);
+					fl.delete();
+				}
+				warning = "<html><div style='text-align:center; color:red'>No records found</div></html>";
+	    		warnLabel.setText(warning);
+			}
+			else {
+				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries + " records found</div></html>";
+	    		warnLabel.setText(warning);
 			}
 		}
 	}
@@ -582,6 +603,7 @@ public class Frame {
   			  }
 	      }
 	}
+	
 
 	   private boolean checkDateTimeFormat(String dateTime) {
 
