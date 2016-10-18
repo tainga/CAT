@@ -443,6 +443,7 @@ public class Frame {
 	    			PopUp pop = popup();
 	    			try {
 						reader.parseLog(inputDirectory, pop, rdbtnErrorsOnly.isSelected());
+						pop.setVisible(true);
 					} catch (FileNotFoundException e1) {
 						System.out.println("Something went terrribly wrong. Sorry about that.");
 					}
@@ -554,7 +555,6 @@ public class Frame {
 			
 			if (numberOfEntries == 0) {
 				if (pop != null) {
-					pop.setVisible(false);
 					pop.dispose();
 				}
 				if (chckbxToTextFile.isSelected()) {
@@ -565,6 +565,7 @@ public class Frame {
 	    		warnLabel.setText(warning);
 			}
 			else {
+				pop.setVisible(true);
 				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries + " records found</div></html>";
 	    		warnLabel.setText(warning);
 			}
@@ -640,7 +641,7 @@ public class Frame {
 		   PopUp frame = null;
 					try {
 						frame = new PopUp();
-						frame.setVisible(true);
+						frame.setVisible(false);
 						
 						java.net.URL iconURL = getClass().getResource("cat-paw.png");
 						ImageIcon icon = new ImageIcon(iconURL);
