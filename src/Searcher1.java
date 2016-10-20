@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
 
-public class Searcher {
+public class Searcher1 {
 
 	private static String brk = System.lineSeparator();
 	
@@ -42,34 +42,39 @@ public class Searcher {
 		    		while (reader.hasNextLine()) {
 		    			String line = reader.nextLine();
 		    			
-		    			//all records mode
-		    			if (!errorsOnly) {  
-		    				
-		    				if (lineContainsTerm(searchType, searchTerm, line)) {
-		    					if (!previous.equals("")) previous += brk;
-		    					if (toConsole) pop.addText(previous + line + brk + brk);
-		    					if (writer != null) writer.println(previous + line + brk); 	
-		    					numberOfRecords++;
-		    				previous = "";
-		    				}
-		    				
-		    				else {
-		    					previous = line;
+		    			
+		    			if (!errorsOnly) {
+		    				switch (searchType) {
+		    				case "general": numberOfRecords += searchGeneralAll(writer, searchTerm, toConsole, pop, line, previous);
+		    				break;
+		    				case "error type": numberOfRecords += searchTypeAll(writer, searchTerm, toConsole, pop, line, previous);
+		    				break;
+		    				case "location": numberOfRecords += searchLocationAll(writer, searchTerm, toConsole, pop, line, previous);
+		    				break;
+		    				case "sensor": numberOfRecords += searchSensorAll(writer, searchTerm, toConsole, pop, line, previous);
+		    				break;
+		    				case "time range": numberOfRecords += searchTimeAll(writer, searchTerm, toConsole, pop, line, previous);
+		    				break;
 		    				}
 		    				
 		    			}
-		    			
-		    			//errors only mode
 		    			else {
 		    				if (line.contains("ERROR")) { 
 		    					Error error = Reader.parse(previous, line);
-
-		    					if (true/*method call goes here*/) {
-		    						if (toConsole) pop.addText(error.toString() + brk);
-		    						if (writer != null) writer.println(error.toString());
-		    						numberOfRecords++;
-		    					}
-
+		    					
+		    					switch (searchType) {
+			    				case "general": numberOfRecords += searchGeneralError(writer, searchTerm, toConsole, pop, error);
+			    				break;
+			    				case "error type": numberOfRecords += searchTypeError(writer, searchTerm, toConsole, pop, error);
+			    				break;
+			    				case "location": numberOfRecords += searchLocationError(writer, searchTerm, toConsole, pop, error);
+			    				break;
+			    				case "sensor": numberOfRecords += searchSensorError(writer, searchTerm, toConsole, pop, error);
+			    				break;
+			    				case "time range": numberOfRecords += searchTimeError(writer, searchTerm, toConsole, pop, error);
+			    				break;
+			    				}
+		    					
 		    					previous = "";
 		    				}
 		    				else {
@@ -77,7 +82,9 @@ public class Searcher {
 		    				}
 		    			}
 		    		}
-		    		reader.close();	
+		    		reader.close();
+
+		    		
 		    	}
 		    	else continue;
 		    	
@@ -92,80 +99,19 @@ public class Searcher {
 		  return numberOfRecords;
 	}
 	
-/*
-switch (searchType) {
-case "general": numberOfRecords += searchGeneralError(writer, searchTerm, toConsole, pop, error);
-break;
-case "error type": numberOfRecords += searchTypeError(writer, searchTerm, toConsole, pop, error);
-break;
-case "location": numberOfRecords += searchLocationError(writer, searchTerm, toConsole, pop, error);
-break;
-case "sensor": numberOfRecords += searchSensorError(writer, searchTerm, toConsole, pop, error);
-break;
-case "time range": numberOfRecords += searchTimeError(writer, searchTerm, toConsole, pop, error);
-break;*/
-
-	public boolean lineContainsTerm(String searchType, String searchTerm, String line) {
-		
-		switch (searchType) {
-		
-			case "general": {
-				// supports several search terms divided by , _ or whitespace
-				String[] terms = searchTerm.split("\\s*(_|,|\\s)\\s*");
-	
-				boolean matchFound = true;
-				
-				for (int i = 0; i < terms.length && matchFound; i++) {
-					if (!line.toLowerCase().contains(terms[i])) matchFound = false;
-				}
-				return matchFound;
-			}
-			// no need for break since there is a return statement (?)
-			
-			case "error type": {
-				return line.toLowerCase().contains(searchTerm);
-			}
-			
-			case "location": {
-				return line.toLowerCase().contains(searchTerm);
-			}
-			
-			case "sensor": {
-				return line.toLowerCase().contains(searchTerm);
-			}
-			
-			case "time range":{
-				GregorianCalendar start = null;
-				GregorianCalendar finish = null;
-				
-				try {
-					String[] tmp = searchTerm.split("\n");
-					start = parseDateTime(tmp[0]);
-					finish = parseDateTime(tmp[1]);
-				} catch (Exception e) {
-					System.out.println("Error parsing date and time: " + searchTerm);
-				}
-				
-				String[] tmp = line.split(" ");
-				if (tmp.length < 2) return false; //fix!
-				String dateAndTime = tmp[0] + " " + tmp[1];
-				GregorianCalendar lineDateTime;
-				
-				try {
-					lineDateTime = parseDateTime(dateAndTime);
-				} catch (Exception e) {
-					System.out.println("Error parsing date and time: " + dateAndTime);
-					return false;														// fix!
-				}
-				
-				return (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0);
-			}
-			
-			default: {
-				throw new IllegalArgumentException("searchType must be equal to one of the following: 'general', 'error type', 'location', 'sensor', 'time range'");
-			}
-	
+	public int searchAll(PrintWriter writer, String term, boolean toConsole, PopUp pop, String line, String previous) throws FileNotFoundException {
+		int recordCounter = 0;
+		if (line.toLowerCase().contains(term)) {
+			if (!previous.equals("")) previous += brk;
+			if (toConsole) pop.addText(previous + line + brk + brk);
+			if (writer != null) writer.println(previous + line + brk); 	
+			recordCounter++;
+		previous = "";
 		}
+		else {
+			previous = line;
+		}
+		return recordCounter;
 	}
 				
 	public int searchError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
@@ -180,7 +126,29 @@ break;*/
 		return recordCounter;
 	}
 	
+	public int searchGeneralAll(PrintWriter writer, String term, boolean toConsole, PopUp pop, String line, String previous) throws FileNotFoundException {
+		// supports several search terms divided by , _ or whitespace
+		String[] terms = term.split("\\s*(_|,|\\s)\\s*");
 
+		boolean matchFound = true;
+		
+		for (int i = 0; i < terms.length && matchFound; i++) {
+			if (!line.toLowerCase().contains(terms[i])) matchFound = false;
+		}
+		
+		int recordCounter = 0;
+		if (matchFound) {
+			if (!previous.equals("")) previous += brk;
+			if (toConsole) pop.addText(previous + line + brk + brk);
+			if (writer != null) writer.println(previous + line + brk); 	
+			recordCounter++;
+		previous = "";
+		}
+		else {
+			previous = line;
+		}
+		return recordCounter;
+	}
 				
 	public int searchGeneralError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
 		int recordCounter = 0;
@@ -193,7 +161,11 @@ break;*/
 			
 		return recordCounter;
 	}
+	
+	public int searchTypeAll(PrintWriter writer, String term, boolean toConsole, PopUp pop, String line, String previous) throws FileNotFoundException {
 
+		return searchAll(writer, term, toConsole, pop, line, previous);			
+	}
 	
 	public int searchTypeError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
 
@@ -208,7 +180,9 @@ break;*/
 		return recordCounter;
 	}
 	
-
+	public int searchLocationAll(PrintWriter writer, String term, boolean toConsole, PopUp pop, String line, String previous) throws FileNotFoundException {
+		return searchAll(writer, term, toConsole, pop, line, previous);
+	}
 	
 	public int searchLocationError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
 		
@@ -226,7 +200,9 @@ break;*/
 		return recordCounter;
 	}
 		
-
+	public int searchSensorAll(PrintWriter writer, String term, boolean toConsole, PopUp pop, String line, String previous) throws FileNotFoundException {
+		return searchAll(writer, term, toConsole, pop, line, previous);
+	}
 	
 	public int searchSensorError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
 		String[] tmp = term.split("/");
@@ -250,7 +226,50 @@ break;*/
 
 		return recordCounter;
 	}
+	
+
+	public int searchTimeAll(PrintWriter writer, String term, boolean toConsole, PopUp pop, String line, String previous) throws FileNotFoundException {
 		
+		int recordCounter = 0;
+		
+		GregorianCalendar start = null;
+		GregorianCalendar finish = null;
+		
+		try {
+			String[] tmp = term.split("\n");
+			start = parseDateTime(tmp[0]);
+			finish = parseDateTime(tmp[1]);
+		} catch (Exception e) {
+			System.out.println("Error parsing date and time: " + term);
+			return 0;
+		}
+		
+		String[] tmp = line.split(" ");
+		if (tmp.length < 2) return 0;
+		String dateAndTime = tmp[0] + " " + tmp[1];
+		GregorianCalendar lineDateTime;
+		
+		try {
+			lineDateTime = parseDateTime(dateAndTime);
+		} catch (Exception e) {
+			System.out.println("Error parsing date and time: " + dateAndTime);
+			return 0;														// maybe handle this better
+		}
+		
+		if (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0) {
+			
+				if (!previous.equals("")) previous += brk;
+				if (toConsole) pop.addText(previous + line + brk + brk);
+				if (writer != null) writer.println(previous + line + brk); 	
+				recordCounter++;
+				previous = "";
+		}
+		else {
+				previous = line;
+		}
+		
+		return recordCounter;
+	}		
 	
 	public int searchTimeError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
 		
