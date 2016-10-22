@@ -56,7 +56,6 @@ public class Searcher {
 		    				else {
 		    					previous = line;
 		    				}
-		    				
 		    			}
 		    			
 		    			//errors only mode
@@ -64,7 +63,7 @@ public class Searcher {
 		    				if (line.contains("ERROR")) { 
 		    					Error error = Reader.parse(previous, line);
 
-		    					if (true/*method call goes here*/) {
+		    					if (errorContainsTerm(searchType, searchTerm, error)) {
 		    						if (toConsole) pop.addText(error.toString() + brk);
 		    						if (writer != null) writer.println(error.toString());
 		    						numberOfRecords++;
@@ -91,19 +90,6 @@ public class Searcher {
 		  
 		  return numberOfRecords;
 	}
-	
-/*
-switch (searchType) {
-case "general": numberOfRecords += searchGeneralError(writer, searchTerm, toConsole, pop, error);
-break;
-case "error type": numberOfRecords += searchTypeError(writer, searchTerm, toConsole, pop, error);
-break;
-case "location": numberOfRecords += searchLocationError(writer, searchTerm, toConsole, pop, error);
-break;
-case "sensor": numberOfRecords += searchSensorError(writer, searchTerm, toConsole, pop, error);
-break;
-case "time range": numberOfRecords += searchTimeError(writer, searchTerm, toConsole, pop, error);
-break;*/
 
 	public boolean lineContainsTerm(String searchType, String searchTerm, String line) {
 		
@@ -167,117 +153,50 @@ break;*/
 	
 		}
 	}
-				
-	public int searchError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
-		int recordCounter = 0;
-				
-		if (error.contains(term)) {
-			if (toConsole) pop.addText(error.toString() + brk);
-			if (writer != null) writer.println(error.toString());
-			recordCounter++;
-		}
-			
-		return recordCounter;
-	}
 	
-
-				
-	public int searchGeneralError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
-		int recordCounter = 0;
-				
-		if (error.contains(term)) {
-			if (toConsole) pop.addText(error.toString() + brk);
-			if (writer != null) writer.println(error.toString());
-			recordCounter++;
-		}
-			
-		return recordCounter;
-	}
-
-	
-	public int searchTypeError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
-
-		int recordCounter = 0;
-					
-		if (error.getType().toLowerCase().equals(term)) {
-			if (toConsole) pop.addText(error.toString() + brk);
-			if (writer != null) writer.println(error.toString());
-			recordCounter++;
-		}
-
-		return recordCounter;
-	}
-	
-
-	
-	public int searchLocationError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
+	public boolean errorContainsTerm(String searchType, String searchTerm, Error error) {
 		
-		int recordCounter = 0;
-		
-		String[] tmp = term.split("/");
-		String searchedLocation = "Rack " + tmp[0] + ", Module " + tmp[1] + ", Line " + tmp[2];
-
-		if (error.getLocation().equals(searchedLocation)) {
-			if (toConsole) pop.addText(error.toString() + brk);
-			if (writer != null) writer.println(error.toString());
-			recordCounter++;
-		}
-
-		return recordCounter;
-	}
-		
-
-	
-	public int searchSensorError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
-		String[] tmp = term.split("/");
-		int recordCounter = 0;
-		try {
-			recordCounter = 0;
+		switch (searchType) {
 			
-			
-			String searchedLocation = "Module " + tmp[0] + ", Line " + tmp[1];
-
-			if (error.getLocation().contains(searchedLocation)) {
-				if (toConsole) pop.addText(error.toString() + brk);
-				if (writer != null) writer.println(error.toString());
-				recordCounter++;
+			case "general": {
+				return error.contains(searchTerm);
 			}
-		} catch (Exception e) {
-			System.out.println(term);
-			System.out.println(Arrays.toString(tmp));
-			e.printStackTrace();
-		}
-
-		return recordCounter;
-	}
 		
+			case "error type": {
+				return error.getType().toLowerCase().equals(searchTerm);
+			}
+			
+			case "location": {
+				String[] tmp = searchTerm.split("/");
+				String searchedLocation = "Rack " + tmp[0] + ", Module " + tmp[1] + ", Line " + tmp[2];
 	
-	public int searchTimeError(PrintWriter writer, String term, boolean toConsole, PopUp pop, Error error) throws FileNotFoundException {
-		
-		int recordCounter = 0;
-		
-		GregorianCalendar start = null;
-		GregorianCalendar finish = null;
-		GregorianCalendar lineDateTime = error.getDateTime();
-		
-		try {
-			String[] tmp = term.split("\n");
-			start = parseDateTime(tmp[0]);
-			finish = parseDateTime(tmp[1]);
-		} catch (Exception e) {
-			System.out.println("Error parsing date and time: " + term);
-			return 0;
+				return error.getLocation().equals(searchedLocation);
+			}
+			
+			case "sensor": {
+				String[] tmp = searchTerm.split("/");
+				String searchedSensor = "Module " + tmp[0] + ", Line " + tmp[1];
+	
+				return error.getLocation().contains(searchedSensor);
+			}
+			
+			case "time range": {
+				GregorianCalendar start = null;
+				GregorianCalendar finish = null;
+				GregorianCalendar lineDateTime = error.getDateTime();
+	
+				String[] tmp = searchTerm.split("\n");
+				start = parseDateTime(tmp[0]);
+				finish = parseDateTime(tmp[1]);
+	
+				return start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0;
+			}
+			
+			default: {
+				throw new IllegalArgumentException("searchType must be equal to one of the following: 'general', 'error type', 'location', 'sensor', 'time range'");
+			}
 		}
-		
-		if (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0) {
-			if (toConsole) pop.addText(error.toString() + brk);
-			if (writer != null) writer.println(error.toString());
-			recordCounter++;
-		}
-
-		return recordCounter;
 	}
-		
 	
 	private GregorianCalendar parseDateTime(String dateTime) {
 		
