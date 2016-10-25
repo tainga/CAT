@@ -3,103 +3,103 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 
 public class Reader {
 
 	private static String brk = System.lineSeparator();
 		
-	// prints error report to console
-	public void parseLog(String inputDirectory, PopUp pop, boolean errorsOnly) throws FileNotFoundException {
+	public int parseLog(String inputDirectory, PopUp pop, String outputPath, boolean errorsOnly, boolean toConsole, boolean toTextFile) {
+
+		if (toTextFile && (outputPath == null || outputPath.trim().isEmpty())) {
+			JOptionPane.showMessageDialog(null, "Output destination not specified", "Error", JOptionPane.ERROR_MESSAGE);
+			return 0;
+		}
 		
-		  File dir = new File(inputDirectory);
-		  
-		  File[] directoryListing = dir.listFiles();
+		if (inputDirectory == null || inputDirectory.trim().isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Input directory not specified", "Error", JOptionPane.ERROR_MESSAGE);
+			return 0;
+		}
 		
-		  if (directoryListing != null) {
-		    for (File log : directoryListing) {
-		    	
-		    	if (log.isDirectory() || log.getName().length() < 7) continue;
-		      
-		    	if (log.getName().substring(0, 7).equals("control")) {
-			    	Scanner reader = new Scanner(log);
-					String previous = "";
-	
-					while (reader.hasNextLine()) {
-						String line = reader.nextLine();
-						
-						if (errorsOnly) {
-							if (isErrorLine(line)) { 
-								Error error = parse(previous, line);
-								pop.addText(error.toString() + brk);
-								previous = "";
-							}
-							else {
-								previous = line;
-							}
-						}
-						else {
-							pop.addText(line + brk);
-						}
+		File dir = null;
+		File[] directoryListing = null;
+		try {
+			dir = new File(inputDirectory);
+			directoryListing = dir.listFiles();
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			return 0;
+		}
+		
+		if (pop == null) {
+			JOptionPane.showMessageDialog(null, "Unable to find output window", "Error", JOptionPane.ERROR_MESSAGE);
+			return 0;
+		}
+
+		PrintWriter writer = null;
+		if (toTextFile) {
+			try {
+				writer = new PrintWriter(outputPath);
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Unable to create output file in directory: " + outputPath, "Error", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+		int recordCounter = 0;
+
+			for (File log : directoryListing) {
+
+				if (log.isDirectory() || log.getName().length() < 7)
+					continue;
+
+				if (log.getName().substring(0, 7).equals("control")) {
+					
+					Scanner reader = null;
+					try {
+						reader = new Scanner(log);
+					} catch (FileNotFoundException e) {
+						System.out.println("Unable to read from file: " + log.getAbsolutePath());
+						continue;
 					}
 					
-					reader.close();
-		    	}
-		    	else continue;
-		    	
-		    }
-		    
-		  } else {
-			  pop.addText("Directory not found. Please make sure that the directory you specified is really a directory.");
-		  }  
-	}
-	
-	// prints error report to file
-	public void parseLog(String inputDirectory, String outputPath, boolean errorsOnly) throws FileNotFoundException {
-		
-		PrintWriter writer = new PrintWriter(outputPath);
-		
-		  File dir = new File(inputDirectory);
-		  File[] directoryListing = dir.listFiles();
-		
-		  if (directoryListing != null) {
-		    for (File log : directoryListing) {
-		    	
-		    	if (log.isDirectory() || log.getName().length() < 7) continue;
-		      
-		    	if (log.getName().substring(0, 7).equals("control")) {
-			    	Scanner reader = new Scanner(log);
 					String previous = "";
-	
+
 					while (reader.hasNextLine()) {
 						String line = reader.nextLine();
-						
+
 						if (errorsOnly) {
 							if (isErrorLine(line)) {
 								Error error = parse(previous, line);
-								writer.println(error.toString() + brk);
+								if (toConsole)
+									pop.addText(error.toString() + brk);
+								if (toTextFile)
+									writer.println(error.toString() + brk);
+								recordCounter++;
 								previous = "";
 							} 
 							else {
 								previous = line;
-							} 
-						}
+							}
+						} 
 						else {
-							writer.println(line + brk);
+							if (toConsole) pop.addText(line + brk);
+							if (toTextFile) writer.println(line + brk);
+							recordCounter++;
 						}
 					}
-					
-					reader.close();
-		    	}
-		    	else continue;
-		    	
-		    }
-		    
-		  } else {
-				System.out.println("Directory not found. Please make sure that the directory you specified is really a directory.");
-		  }
-		  writer.close();
-		  
+
+					reader.close();	
+				} 
+			}
+
+		if (writer != null) writer.close();
+		
+		return recordCounter;
 	}
+	
+	
 	
 	private static boolean isErrorLine(String line) { 
 		if (line.contains("ERROR")) {
@@ -121,8 +121,7 @@ public class Reader {
 		}
 		else {
 			System.out.println();
-			throw new IllegalArgumentException("Input error");
-			
+			throw new IllegalArgumentException("Input error");   //fix
 		}
 	
 		return err;

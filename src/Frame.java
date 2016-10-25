@@ -17,7 +17,6 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,7 +55,8 @@ public class Frame {
 	private JComboBox<Integer> comboBox_4;
 	private JComboBox<Integer> comboBox_5;
 	private JComboBox<String> comboBox_6;
-
+	
+	private PopUp pop;
 
 	/**
 	 * Create the application.
@@ -405,132 +405,63 @@ public class Frame {
 	}
 	
 	class OutputGenerator implements ActionListener {
-	      public void actionPerformed(ActionEvent e) {
+		
+		public void actionPerformed(ActionEvent e) {
 
-	    	  String warning = "";
-	    	  warnLabel.setText(warning);
-	    	  outputWarnLbl.setText("");
-			  modeWarnLbl.setText("");
-	    	  
-	    	  if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
-	    		  outputWarnLbl.setText("Select output");
-	    	  }
-	    	  if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
-	    		  modeWarnLbl.setText("Select mode");
-	    	  }
-	    	  if (chckbxToTextFile.isSelected() && outputDirectory == null) {
-	    		  warning += "Please select output directory<br>";
-	    	  }
-	    	  if (inputDirectory == null) {
-	    		  warning += "Please select input directory<br>";
-	    	  }
-			
-	    	  if (!warning.equals("")) {
-	    		  warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
-	    		  warnLabel.setText(warning);
-	    		  return;
-	    	  }
-	    	  
-	    	  if (chckbxToTextFile.isSelected()) {
-		    	String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
-		    	outputDirectory = fc.getSelectedFile().getAbsolutePath();
-				outputDirectory += "\\CAT " + dateTime + ".txt";
-	    	  }
-			
-	    	  Reader reader = new Reader();
+			boolean userSelectionsAreValid = validateUserSelections();
+			if (!userSelectionsAreValid) return;
 
-	    		if (chckbxToConsole.isSelected()) {
-	    			PopUp pop = popup();
-	    			try {
-						reader.parseLog(inputDirectory, pop, rdbtnErrorsOnly.isSelected());
-						pop.setVisible(true);
-					} catch (FileNotFoundException e1) {
-						System.out.println("Something went terrribly wrong. Sorry about that.");
-					}
-		    	}
-		    	  
-		    	if (chckbxToTextFile.isSelected()) {
-		    		try {
-						reader.parseLog(inputDirectory, outputDirectory, rdbtnErrorsOnly.isSelected());
-					} catch (FileNotFoundException e1) {
-						System.out.println("Something went terrribly wrong. Sorry about that.");
-					}
-		    	}
-	      }
+			initializeOutput();
+
+			Reader reader = new Reader();
+			int numberOfEntries = 0;
+			String warning = "";
+
+			numberOfEntries = reader.parseLog(inputDirectory, pop, outputDirectory, rdbtnErrorsOnly.isSelected(),
+					chckbxToConsole.isSelected(), chckbxToTextFile.isSelected());
+
+			if (numberOfEntries == 0) {
+				if (chckbxToConsole.isSelected()) {
+					pop.dispose();
+				}
+				if (chckbxToTextFile.isSelected()) {
+					File fl = new File(outputDirectory);
+					fl.delete();
+				}
+				warning = "<html><div style='text-align:center; color:red'>No records found</div></html>";
+				warnLabel.setText(warning);
+			}
+
+			else {
+				if (chckbxToConsole.isSelected()) {
+					pop.setVisible(true);
+				}
+				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries
+						+ " records found</div></html>";
+				warnLabel.setText(warning);
+			}
+
+		}
 	}
+	
 	
 	class SearchListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			String warning = "";
-	    	  warnLabel.setText(warning);
-	    	  outputWarnLbl.setText("");
-			  modeWarnLbl.setText("");
-	    	  
-	    	  if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
-	    		  outputWarnLbl.setText("Select output");
-	    	  }
-	    	  if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
-	    		  modeWarnLbl.setText("Select mode");
-	    	  }
-	    	  if (chckbxToTextFile.isSelected() && outputDirectory == null) {
-	    		  warning += "Please select output directory<br>";
-	    	  }
-	    	  if (inputDirectory == null) {
-	    		  warning += "Please select input directory<br>";
-	    	  }
-	    	  
-	    	  String option = (String) comboBox.getSelectedItem();
-	    	  
-	    	  switch (option) {
-	    	  	case "---------------":
-	    	  		warning += "Please select search option<br>";
-	    	  		break;
-				case "general": 
-					if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
-						warning += "Please enter search term<br>";
-					}
-					break;
-				case "error type": 
-					/*
-					if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
-						warning += "Please enter error type<br>";
-					}; 
-					*/
-				break;
-				case "time range": 
-					if (textField_3.getText() == null || textField_4.getText() == null) {
-						warning += "Please enter time range<br>";
-						break;
-					}
-					String from = textField_3.getText();
-					String till = textField_4.getText();
-					if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
-						warning += "Incorrect format of time range<br>";
-					}
-					break;
-				}
+			boolean userSelectionsAreValid = validateUserSelections();
+			if (!userSelectionsAreValid) return;
 			
-	    	  if (!warning.equals("")) {
-	    		  warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
-	    		  warnLabel.setText(warning);
-	    		  return;
-	    	  }
-	    	  
-	    	if (chckbxToTextFile.isSelected()) {
-			    String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
-			    outputDirectory = fc.getSelectedFile().getAbsolutePath();
-				outputDirectory += "\\CAT " + dateTime + ".txt";
-		    }
-	    	PopUp pop = null;
-			if (chckbxToConsole.isSelected()) {
-				pop = popup();
-			}
+			boolean searchOptionIsValid = validateSearchOption();
+			if (!searchOptionIsValid) return;
+			
+	    	initializeOutput();
 	    	
 			Searcher finder = new Searcher();
 			String term = "";
+			
+			String option = (String) comboBox.getSelectedItem();
 			
 			switch (option) {
 			case "general": term = textField_1.getText(); break;
@@ -545,13 +476,10 @@ public class Frame {
 			default: System.out.println("Wrong 'search by' option");
 			}
 			
-			int numberOfEntries = -4;
+			int numberOfEntries = 0;
+			String warning = "";
 			
-			try {
-				numberOfEntries = finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
-			} catch (FileNotFoundException e1) {
-				System.out.println("Something went terrribly wrong. Sorry about that.");
-			}
+			numberOfEntries = finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
 			
 			if (numberOfEntries == 0) {
 				if (pop != null) {
@@ -570,6 +498,7 @@ public class Frame {
 	    		warnLabel.setText(warning);
 			}
 		}
+
 	}
 	
 	class SearchOptionListener implements ActionListener {
@@ -637,20 +566,106 @@ public class Frame {
 		    comboBox_6.setEnabled(false);
 	   }
 	   
-	   private PopUp popup() {
-		   PopUp frame = null;
-					try {
-						frame = new PopUp();
-						frame.setVisible(false);
-						
-						java.net.URL iconURL = getClass().getResource("cat-paw.png");
-						ImageIcon icon = new ImageIcon(iconURL);
-						frame.setIconImage(icon.getImage());
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-			return frame;
-	   }
+	private boolean validateUserSelections() {
+
+		String warning = "";
+
+		warnLabel.setText(warning);
+		outputWarnLbl.setText("");
+		modeWarnLbl.setText("");
+
+		if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
+			outputWarnLbl.setText("Select output");
+		}
+		if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
+			modeWarnLbl.setText("Select mode");
+		}
+		if (chckbxToTextFile.isSelected() && outputDirectory == null) {
+			warning += "Please select output directory<br>";
+		}
+		if (inputDirectory == null) {
+			warning += "Please select input directory<br>";
+		}
+
+		if (!warning.equals("")) {
+			warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
+			warnLabel.setText(warning);
+			return false;
+		}
+
+		return true;
+	}
+		
+	private boolean validateSearchOption() {
+
+		String warning = "";
+		String option = (String) comboBox.getSelectedItem();
+
+		switch (option) {
+
+		case "---------------":
+			warning += "Please select search option<br>";
+			break;
+
+		case "general":
+			if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
+				warning += "Please enter search term<br>";
+			}
+			break;
+
+		case "error type":
+			// drop-down list
+			break;
+
+		case "time range":
+			if (textField_3.getText() == null || textField_4.getText() == null) {
+				warning += "Please enter time range<br>";
+				break;
+			}
+
+			String from = textField_3.getText();
+			String till = textField_4.getText();
+			if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
+				warning += "Incorrect format of time range<br>";
+			}
+			break;
+		}
+		
+		if (warning != "") {
+			warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
+			warnLabel.setText(warning);
+			return false;
+		}
+		
+		return true;
+	}
+	   
+	private void initializeOutput() {
+		if (chckbxToTextFile.isSelected()) {
+		    String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
+		    outputDirectory = fc.getSelectedFile().getAbsolutePath();
+			outputDirectory += "\\CAT " + dateTime + ".txt";
+	    }
+    	
+		if (chckbxToConsole.isSelected()) {
+			pop = popup();
+		}
+	}
+	
+	private PopUp popup() {
+		PopUp frame = null;
+		try {
+			frame = new PopUp();
+			frame.setVisible(false);
+
+			java.net.URL iconURL = getClass().getResource("cat-paw.png");
+			ImageIcon icon = new ImageIcon(iconURL);
+			frame.setIconImage(icon.getImage());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return frame;
+	}
 
 }
