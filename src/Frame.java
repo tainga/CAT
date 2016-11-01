@@ -2,6 +2,7 @@ import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import java.awt.GridLayout;
@@ -16,6 +17,8 @@ import java.awt.FlowLayout;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
@@ -367,7 +370,7 @@ public class Frame {
 	    
 	    textField_4 = new JTextField();
 	    textField_4.setColumns(10);
-	    textField_4.addActionListener(new SearchListener());
+
 	    panel_10.add(textField_4);
 	    
 	    JLabel lblEx = new JLabel("ex.: 6/27/2016 13:40:46");
@@ -383,7 +386,7 @@ public class Frame {
 	    JButton btnSearch = new JButton("");
 	    JLabel searchLbl = new JLabel("Search");
 	    btnSearch.add(searchLbl);
-	    btnSearch.addActionListener(new SearchListener());
+
 	    panel_13.add(btnSearch);
 	    
 	    JPanel panel_17 = new JPanel();
@@ -400,6 +403,9 @@ public class Frame {
 		JLabel lblcopy = new JLabel("\u00a9 2016");
 		panel_3.add(lblcopy);	
 		
+	    textField_1.addActionListener(new SearchListener());
+	    textField_4.addActionListener(new SearchListener());
+	    btnSearch.addActionListener(new SearchListener());
 	    comboBox.addActionListener(new SearchOptionListener());
 		lockFields();
 	}
@@ -421,19 +427,23 @@ public class Frame {
 					chckbxToConsole.isSelected(), chckbxToTextFile.isSelected());
 
 			if (numberOfEntries == 0) {
-				if (chckbxToConsole.isSelected()) {
+				if (chckbxToConsole.isSelected() && pop != null) {
 					pop.dispose();
 				}
 				if (chckbxToTextFile.isSelected()) {
 					File fl = new File(outputDirectory);
-					fl.delete();
+					try {
+						fl.delete();
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 				warning = "<html><div style='text-align:center; color:red'>No records found</div></html>";
 				warnLabel.setText(warning);
 			}
 
 			else {
-				if (chckbxToConsole.isSelected()) {
+				if (chckbxToConsole.isSelected() && pop != null) {
 					pop.setVisible(true);
 				}
 				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries
@@ -456,9 +466,6 @@ public class Frame {
 			boolean searchOptionIsValid = validateSearchOption();
 			if (!searchOptionIsValid) return;
 			
-	    	initializeOutput();
-	    	
-			Searcher finder = new Searcher();
 			String term = "";
 			
 			String option = (String) comboBox.getSelectedItem();
@@ -473,27 +480,35 @@ public class Frame {
 				String till = textField_4.getText().trim();
 				term = from + "\n" + till; 
 				break;
-			default: System.out.println("Wrong 'search by' option");
+			default: JOptionPane.showMessageDialog(null, "'Search by' option does not match any of the supported options", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
 			int numberOfEntries = 0;
 			String warning = "";
-			
+	    	
+			initializeOutput();
+			Searcher finder = new Searcher();
 			numberOfEntries = finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
 			
 			if (numberOfEntries == 0) {
-				if (pop != null) {
+				if (chckbxToConsole.isSelected() && pop != null) {
 					pop.dispose();
 				}
 				if (chckbxToTextFile.isSelected()) {
 					File fl = new File(outputDirectory);
-					fl.delete();
+					try {
+						fl.delete();
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 				warning = "<html><div style='text-align:center; color:red'>No records found</div></html>";
 	    		warnLabel.setText(warning);
 			}
 			else {
-				pop.setVisible(true);
+				if (pop != null && chckbxToConsole.isSelected()) {
+					pop.setVisible(true);
+				}
 				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries + " records found</div></html>";
 	    		warnLabel.setText(warning);
 			}
@@ -537,17 +552,17 @@ public class Frame {
 
 	   private boolean checkDateTimeFormat(String dateTime) {
 
-		    String re1="(\\d+)";	// Integer Number 1
-		    String re2="(\\/)";	// Any Single Character 1
-		    String re3="((?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])";	// Day 1
-		    String re4="(\\/)";	// Any Single Character 2
-		    String re5="((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])";	// Year 1
+		    String re1="(\\d+)";	// Integer
+		    String re2="(\\/)";	// slash
+		    String re3="((?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])";	// Day
+		    String re4="(\\/)";	// slash
+		    String re5="((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])";	// Year
 		    String re6="( )";	// White Space 1
-		    String re7="((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)";	// HourMinuteSec 1
+		    String re7="((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)";	// HourMinuteSec
 
 		    Pattern p = Pattern.compile(re1+re2+re3+re4+re5+re6+re7,Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 		    Matcher m = p.matcher(dateTime);
-
+		    
 		    return m.matches();
 	   }
 	   
@@ -569,6 +584,7 @@ public class Frame {
 	private boolean validateUserSelections() {
 
 		String warning = "";
+		boolean modeAndDestinationChosen = true;
 
 		warnLabel.setText(warning);
 		outputWarnLbl.setText("");
@@ -576,9 +592,11 @@ public class Frame {
 
 		if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
 			outputWarnLbl.setText("Select output");
+			modeAndDestinationChosen = false;
 		}
 		if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
 			modeWarnLbl.setText("Select mode");
+			modeAndDestinationChosen = false;
 		}
 		if (chckbxToTextFile.isSelected() && outputDirectory == null) {
 			warning += "Please select output directory<br>";
@@ -592,6 +610,7 @@ public class Frame {
 			warnLabel.setText(warning);
 			return false;
 		}
+		if (!modeAndDestinationChosen) {return false;}
 
 		return true;
 	}
@@ -623,15 +642,15 @@ public class Frame {
 				break;
 			}
 
-			String from = textField_3.getText();
-			String till = textField_4.getText();
+			String from = textField_3.getText().trim();
+			String till = textField_4.getText().trim();
 			if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
 				warning += "Incorrect format of time range<br>";
 			}
 			break;
 		}
 		
-		if (warning != "") {
+		if (!warning.equals("")) {
 			warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
 			warnLabel.setText(warning);
 			return false;

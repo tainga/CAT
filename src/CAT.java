@@ -1,5 +1,7 @@
 import java.awt.EventQueue;
 
+import javax.swing.JOptionPane;
+
 public class CAT {
 		
 		/**
@@ -13,7 +15,7 @@ public class CAT {
 					Frame window = new Frame();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});

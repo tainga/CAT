@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 public class Searcher {
 
 	private static String brk = System.lineSeparator();
@@ -19,7 +21,7 @@ public class Searcher {
 			try {
 				writer = new PrintWriter(output);
 			} catch (FileNotFoundException e) {
-				System.out.println("Unable to write to directory: " + outputDirectory);
+				JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				return 0;
 			}
 		}
@@ -38,7 +40,8 @@ public class Searcher {
 					try {
 						reader = new Scanner(log);
 					} catch (FileNotFoundException e) {
-						System.out.println("File not found: " + log.getPath());
+						JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						return 0;
 					}
 					
 		    		String previous = "";
@@ -132,18 +135,19 @@ public class Searcher {
 					start = parseDateTime(tmp[0]);
 					finish = parseDateTime(tmp[1]);
 				} catch (Exception e) {
-					System.out.println("Error parsing date and time: " + searchTerm);
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 				
 				String[] tmp = line.split(" ");
-				if (tmp.length < 2) return false; //fix!
+				if (tmp.length < 2) return false; 
+
 				String dateAndTime = tmp[0] + " " + tmp[1];
 				GregorianCalendar lineDateTime;
 				
 				try {
 					lineDateTime = parseDateTime(dateAndTime);
 				} catch (Exception e) {
-					//System.out.println("Error parsing date and time: " + dateAndTime);
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					return false;														
 				}
 				

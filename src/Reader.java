@@ -33,7 +33,7 @@ public class Reader {
 			return 0;
 		}
 		
-		if (pop == null) {
+		if (pop == null && toConsole) {
 			JOptionPane.showMessageDialog(null, "Unable to find output window", "Error", JOptionPane.ERROR_MESSAGE);
 			return 0;
 		}
@@ -60,7 +60,7 @@ public class Reader {
 					try {
 						reader = new Scanner(log);
 					} catch (FileNotFoundException e) {
-						System.out.println("Unable to read from file: " + log.getAbsolutePath());
+						JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						continue;
 					}
 					
@@ -110,18 +110,17 @@ public class Reader {
 	
 	public static Error parse(String statLine, String errorLine) {
 
-		Error err;
+		Error err = null;
 				
 		if (errorLine.contains("ERROR") && statLine.contains("STATUS")) {
 			
 			err = new Error (statLine, errorLine);
 		}
-		else if (statLine == null || statLine == "" || statLine == " ") {
+		else if (statLine == null || statLine.trim().equals("")) {
 			err = new Error (errorLine);
 		}
 		else {
-			System.out.println();
-			throw new IllegalArgumentException("Input error");   //fix
+			JOptionPane.showMessageDialog(null, "Error parsing lines:\n" + statLine + "\n" + errorLine, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 	
 		return err;
