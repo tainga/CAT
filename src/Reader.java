@@ -2,14 +2,27 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Scanner;
-
 import javax.swing.JOptionPane;
-
-
+/**
+ * The Reader class compiles a unified report based on CGW control log files.
+ *
+ */
 public class Reader {
 
 	private static String brk = System.lineSeparator();
-		
+	
+	/**
+	 * Compiles a report by going through all files inside the specified directory whose name start with 'control'; all other files are ignored.
+	 * Depending on the value of the errorsOnly parameter, the report will contain either all raw data (if errorsOnly is false),
+	 * or all error-related records only (if errorsOnly is true). Prints all found data to a text file and/or a text window as specified by the user.	
+	 * @param inputDirectory a path to the directory containing the log files
+	 * @param pop an output window
+	 * @param outputPath a path to the directory in which an output text file is to be created
+	 * @param errorsOnly a boolean specifying whether the report should contain error messages only
+	 * @param toConsole a boolean specifying whether the output should be directed to an output window
+	 * @param toTextFile a boolean specifying whether the output should be directed to a text file
+	 * @return the number of records found
+	 */
 	public int parseLog(String inputDirectory, PopUp pop, String outputPath, boolean errorsOnly, boolean toConsole, boolean toTextFile) {
 
 		if (toTextFile && (outputPath == null || outputPath.trim().isEmpty())) {
@@ -99,8 +112,11 @@ public class Reader {
 		return recordCounter;
 	}
 	
-	
-	
+	/**
+	 * Determines whether the given line should be processed as an error
+	 * @param line the string to be analyzed
+	 * @return true if the record pertains to an error, false otherwise
+	 */
 	private static boolean isErrorLine(String line) { 
 		if (line.contains("ERROR")) {
 			return true;
@@ -108,6 +124,12 @@ public class Reader {
 		return false;
 	}
 	
+	/**
+	 * Constructs an error object based on the error information contained in the lines passed as the parameters
+	 * @param statLine a string containing the status message preceding the error message
+	 * @param errorLine a string containing the error message
+	 * @return an Error object based on the information from the error and status lines
+	 */
 	public static Error parse(String statLine, String errorLine) {
 
 		Error err = null;

@@ -3,13 +3,31 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
-
 import javax.swing.JOptionPane;
-
+/**
+ * The Searcher class implements the search function.
+ * 
+ */
 public class Searcher {
 
 	private static String brk = System.lineSeparator();
 	
+	/**
+	 * Implements the search function by going through all files inside the specified directory whose name start with 'control'; all other files are ignored. 
+	 * Depending on the value of the errorsOnly parameter, the search will be performed either on all raw data (if errorsOnly is false),
+	 * or on all error-related records only (if errorsOnly is true). Creates a Scanner object to iterate through every line of the control files 
+	 * and uses the lineContainsTerm() method to determine if the line contains the search term.
+	 * Prints all found data to a text file and/or a text window as specified by the user.
+	 * @param searchType a string to specify the type of the search to be performed
+	 * @param inputDirectory a path to the directory containing the log files to be searched
+	 * @param outputDirectory a path to the directory in which an output text file is to be created
+	 * @param term a string containing the search term
+	 * @param errorsOnly a boolean specifying whether the search should be performed on error messages only
+	 * @param toTextFile a boolean specifying whether the output should be directed to a text file
+	 * @param toConsole a boolean specifying whether the output should be directed to an output window
+	 * @param pop an output window
+	 * @return the number of records found
+	 */
 	public int search(String searchType, String inputDirectory, String outputDirectory, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) {
 		
 		File dir = new File(inputDirectory);
@@ -98,6 +116,13 @@ public class Searcher {
 		  return numberOfRecords;
 	}
 
+	/**
+	 * Determines if the given string contains the given search term. Used in 'all records' mode.
+	 * @param searchType a string to specify the type of the search to be performed
+	 * @param searchTerm a string containing the search term
+	 * @param line a string to be searched
+	 * @return true if line contains searchTerm, false otherwise
+	 */
 	public boolean lineContainsTerm(String searchType, String searchTerm, String line) {
 		
 		switch (searchType) {
@@ -161,6 +186,13 @@ public class Searcher {
 		}
 	}
 	
+	/**
+	 * Determines if the given error contains the given search term. Used in 'errors only' mode
+	 * @param searchType a string to specify the type of the search to be performed
+	 * @param searchTerm a string containing the search term
+	 * @param error the error object to be searched
+	 * @return true if error contains searchTerm, false otherwise
+	 */
 	public boolean errorContainsTerm(String searchType, String searchTerm, Error error) {
 		
 		switch (searchType) {
@@ -205,6 +237,11 @@ public class Searcher {
 		}
 	}
 	
+	/**
+	 * Parses a string containing date and time and constructs an appropriate Calendar object
+	 * @param dateTime a string containing date and time
+	 * @return a GregorianCalendar object matching the specified date and time
+	 */
 	private GregorianCalendar parseDateTime(String dateTime) {
 		
 		String[] tmp = dateTime.split(" ");

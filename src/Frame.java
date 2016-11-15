@@ -17,8 +17,6 @@ import java.awt.FlowLayout;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
@@ -30,6 +28,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JCheckBox;
 import java.awt.SystemColor;
 
+/**
+ * The Frame class creates the application's main frame and initializes its contents. 
+ * 
+ */
 public class Frame {
 
 	JFrame frame;
@@ -38,14 +40,11 @@ public class Frame {
 	private JCheckBox chckbxToTextFile;
 	private JRadioButton rdbtnErrorsOnly;
 	private JRadioButton rdbtnAllRecords;
-
 	private JFileChooser fc = new JFileChooser();
     private JTextField textField;
     private JTextField textField_2;
-    
     private String inputDirectory;
     private String outputDirectory;
-    
     private JLabel warnLabel;
     private JLabel outputWarnLbl;
     private JLabel modeWarnLbl;
@@ -58,18 +57,18 @@ public class Frame {
 	private JComboBox<Integer> comboBox_4;
 	private JComboBox<Integer> comboBox_5;
 	private JComboBox<String> comboBox_6;
-	
 	private PopUp pop;
 
+
 	/**
-	 * Create the application.
+	 * Class constructor
 	 */
 	public Frame() {
 		initialize();
 	}
-
+	
 	/**
-	 * Initialize the contents of the frame.
+	 * A helper method to initialize the components of the frame.
 	 */
 	private void initialize() {
 		frame = new JFrame();
@@ -176,8 +175,7 @@ public class Frame {
 	    JPanel panel_15 = new JPanel();
 	    panel_5.add(panel_15);
 	    panel_15.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-	    
-	    // Input Folder - Button & JFileChooser
+
 	    JButton btnInputFolder = new JButton("Input folder");
 	    btnInputFolder.setPreferredSize(new Dimension(150, 23));
 	    panel_15.add(btnInputFolder);
@@ -207,7 +205,6 @@ public class Frame {
 	    panel_5.add(panel_16);
 	    panel_16.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 	     
-	    // Output Folder - Button & JFileChooser
 	    JButton btnOutputFolder = new JButton("Output folder");
 	    btnOutputFolder.setPreferredSize(new Dimension(150, 23));
 	    panel_16.add(btnOutputFolder);
@@ -394,7 +391,6 @@ public class Frame {
 	    panel_1.add(panel_17);
 	    
 	    warnLabel = new JLabel("");
-	    //warnLabel.setForeground(Color.red);
 	    panel_17.add(warnLabel);
 		
 		JPanel panel_3 = new JPanel();
@@ -409,7 +405,11 @@ public class Frame {
 	    comboBox.addActionListener(new SearchOptionListener());
 		lockFields();
 	}
-	
+
+	/**
+	 * Inner class to initiate generation of a report when the 'generate' button is pressed.
+	 *
+	 */
 	class OutputGenerator implements ActionListener {
 		
 		public void actionPerformed(ActionEvent e) {
@@ -454,7 +454,10 @@ public class Frame {
 		}
 	}
 	
-	
+	/**
+	 * Inner class to initialize search when the 'search' button is pressed.
+	 *
+	 */
 	class SearchListener implements ActionListener {
 
 		@Override
@@ -516,6 +519,10 @@ public class Frame {
 
 	}
 	
+	/**
+	 * Inner class to monitor the user's choice in the 'search type' drop-down menu and lock the fields that will not be used.
+	 *
+	 */
 	class SearchOptionListener implements ActionListener {
 	      public void actionPerformed(ActionEvent e) {
 	    	  
@@ -549,38 +556,49 @@ public class Frame {
 	      }
 	}
 	
+	/**
+	 * A helper method to check if a string contains valid date and time that match the format 'MM/DD/YYYY HH:MM:SS'.
+	 * @param dateTime a string containing date and time
+	 * @return true if date and time are valid, false otherwise
+	 */
+   private boolean checkDateTimeFormat(String dateTime) {
 
-	   private boolean checkDateTimeFormat(String dateTime) {
+	    String re1="(\\d+)";	// Integer
+	    String re2="(\\/)";	// slash
+	    String re3="((?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])";	// Day
+	    String re4="(\\/)";	// slash
+	    String re5="((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])";	// Year
+	    String re6="( )";	// White Space 1
+	    String re7="((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)";	// HourMinuteSec
 
-		    String re1="(\\d+)";	// Integer
-		    String re2="(\\/)";	// slash
-		    String re3="((?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])";	// Day
-		    String re4="(\\/)";	// slash
-		    String re5="((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])";	// Year
-		    String re6="( )";	// White Space 1
-		    String re7="((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)";	// HourMinuteSec
-
-		    Pattern p = Pattern.compile(re1+re2+re3+re4+re5+re6+re7,Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-		    Matcher m = p.matcher(dateTime);
-		    
-		    return m.matches();
-	   }
+	    Pattern p = Pattern.compile(re1+re2+re3+re4+re5+re6+re7,Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+	    Matcher m = p.matcher(dateTime);
+	    
+	    return m.matches();
+   }
+   
+   /**
+    * A helper method that sets makes all fields in the search area uneditable; used by the SearchOptionListener inner class.
+    */
+   private void lockFields() {
+	   	textField_1.setText("");
+	    textField_1.setEditable(false);
+	    textField_3.setText("");
+	    textField_3.setEditable(false);
+	    textField_4.setText("");
+	    textField_4.setEditable(false);
+	    comboBox_1.setEnabled(false);
+	    comboBox_2.setEnabled(false);
+	    comboBox_3.setEnabled(false);
+	    comboBox_4.setEnabled(false);
+	    comboBox_5.setEnabled(false); 
+	    comboBox_6.setEnabled(false);
+   }
 	   
-	   private void lockFields() {
-		   	textField_1.setText("");
-		    textField_1.setEditable(false);
-		    textField_3.setText("");
-		    textField_3.setEditable(false);
-		    textField_4.setText("");
-		    textField_4.setEditable(false);
-		    comboBox_1.setEnabled(false);
-		    comboBox_2.setEnabled(false);
-		    comboBox_3.setEnabled(false);
-		    comboBox_4.setEnabled(false);
-		    comboBox_5.setEnabled(false); 
-		    comboBox_6.setEnabled(false);
-	   }
-	   
+   /**
+    * A helper method to check if the user has made valid selections in the upper box of the GUI; used by the SearchListener and OutputGenerator classes.
+    * @return true if the user has made all necessary selections and they are valid, false otherwise
+    */
 	private boolean validateUserSelections() {
 
 		String warning = "";
@@ -614,7 +632,11 @@ public class Frame {
 
 		return true;
 	}
-		
+	
+   /**
+    * A helper method to check if the user has made valid selections in the search area of the GUI; used by the SearchListener class.
+    * @return true if the user has made all necessary selections and they are valid, false otherwise
+    */
 	private boolean validateSearchOption() {
 
 		String warning = "";
@@ -633,7 +655,6 @@ public class Frame {
 			break;
 
 		case "error type":
-			// drop-down list
 			break;
 
 		case "time range":
@@ -659,6 +680,11 @@ public class Frame {
 		return true;
 	}
 	   
+	/**
+	 * A helper method to initialize an output object.
+	 * Creates a text file if the user has chosen to direct the output to a text file, 
+	 * and an object of the PopUp class if the user has chosen to direct the output to console.
+	 */
 	private void initializeOutput() {
 		if (chckbxToTextFile.isSelected()) {
 		    String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
@@ -671,6 +697,10 @@ public class Frame {
 		}
 	}
 	
+	/**
+	 * A helper method to create and initialize an object of the PopUp class.
+	 * @return a frame created by the PopUp class
+	 */
 	private PopUp popup() {
 		PopUp frame = null;
 		try {
@@ -682,7 +712,7 @@ public class Frame {
 			frame.setIconImage(icon.getImage());
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		return frame;
 	}
