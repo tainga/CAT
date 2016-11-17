@@ -169,7 +169,6 @@ public class Frame {
 	    panel_1.add(panel_5);
 	    
 		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fc.setCurrentDirectory(new File("C:\\Users\\Anastasia Taing\\Desktop\\CGW project\\example save crash\\chaSYS1_20Jul2016_13_18_17_cgw1f\\CGWLOGS\\control"));
 	    panel_5.setLayout(new GridLayout(2,0));
 	    
 	    JPanel panel_15 = new JPanel();
