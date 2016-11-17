@@ -2,6 +2,7 @@ import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import java.awt.GridLayout;
@@ -17,7 +18,6 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +28,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JCheckBox;
 import java.awt.SystemColor;
 
+/**
+ * The Frame class creates the application's main frame and initializes its contents. 
+ * 
+ */
 public class Frame {
 
 	JFrame frame;
@@ -36,14 +40,11 @@ public class Frame {
 	private JCheckBox chckbxToTextFile;
 	private JRadioButton rdbtnErrorsOnly;
 	private JRadioButton rdbtnAllRecords;
-
 	private JFileChooser fc = new JFileChooser();
     private JTextField textField;
     private JTextField textField_2;
-    
     private String inputDirectory;
     private String outputDirectory;
-    
     private JLabel warnLabel;
     private JLabel outputWarnLbl;
     private JLabel modeWarnLbl;
@@ -56,17 +57,18 @@ public class Frame {
 	private JComboBox<Integer> comboBox_4;
 	private JComboBox<Integer> comboBox_5;
 	private JComboBox<String> comboBox_6;
+	private PopUp pop;
 
 
 	/**
-	 * Create the application.
+	 * Class constructor
 	 */
 	public Frame() {
 		initialize();
 	}
-
+	
 	/**
-	 * Initialize the contents of the frame.
+	 * A helper method to initialize the components of the frame.
 	 */
 	private void initialize() {
 		frame = new JFrame();
@@ -173,8 +175,7 @@ public class Frame {
 	    JPanel panel_15 = new JPanel();
 	    panel_5.add(panel_15);
 	    panel_15.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-	    
-	    // Input Folder - Button & JFileChooser
+
 	    JButton btnInputFolder = new JButton("Input folder");
 	    btnInputFolder.setPreferredSize(new Dimension(150, 23));
 	    panel_15.add(btnInputFolder);
@@ -204,7 +205,6 @@ public class Frame {
 	    panel_5.add(panel_16);
 	    panel_16.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 	     
-	    // Output Folder - Button & JFileChooser
 	    JButton btnOutputFolder = new JButton("Output folder");
 	    btnOutputFolder.setPreferredSize(new Dimension(150, 23));
 	    panel_16.add(btnOutputFolder);
@@ -367,7 +367,7 @@ public class Frame {
 	    
 	    textField_4 = new JTextField();
 	    textField_4.setColumns(10);
-	    textField_4.addActionListener(new SearchListener());
+
 	    panel_10.add(textField_4);
 	    
 	    JLabel lblEx = new JLabel("ex.: 6/27/2016 13:40:46");
@@ -383,7 +383,7 @@ public class Frame {
 	    JButton btnSearch = new JButton("");
 	    JLabel searchLbl = new JLabel("Search");
 	    btnSearch.add(searchLbl);
-	    btnSearch.addActionListener(new SearchListener());
+
 	    panel_13.add(btnSearch);
 	    
 	    JPanel panel_17 = new JPanel();
@@ -391,7 +391,6 @@ public class Frame {
 	    panel_1.add(panel_17);
 	    
 	    warnLabel = new JLabel("");
-	    //warnLabel.setForeground(Color.red);
 	    panel_17.add(warnLabel);
 		
 		JPanel panel_3 = new JPanel();
@@ -400,137 +399,79 @@ public class Frame {
 		JLabel lblcopy = new JLabel("\u00a9 2016");
 		panel_3.add(lblcopy);	
 		
+	    textField_1.addActionListener(new SearchListener());
+	    textField_4.addActionListener(new SearchListener());
+	    btnSearch.addActionListener(new SearchListener());
 	    comboBox.addActionListener(new SearchOptionListener());
 		lockFields();
 	}
-	
+
+	/**
+	 * Inner class to initiate generation of a report when the 'generate' button is pressed.
+	 *
+	 */
 	class OutputGenerator implements ActionListener {
-	      public void actionPerformed(ActionEvent e) {
+		
+		public void actionPerformed(ActionEvent e) {
 
-	    	  String warning = "";
-	    	  warnLabel.setText(warning);
-	    	  outputWarnLbl.setText("");
-			  modeWarnLbl.setText("");
-	    	  
-	    	  if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
-	    		  outputWarnLbl.setText("Select output");
-	    	  }
-	    	  if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
-	    		  modeWarnLbl.setText("Select mode");
-	    	  }
-	    	  if (chckbxToTextFile.isSelected() && outputDirectory == null) {
-	    		  warning += "Please select output directory<br>";
-	    	  }
-	    	  if (inputDirectory == null) {
-	    		  warning += "Please select input directory<br>";
-	    	  }
-			
-	    	  if (!warning.equals("")) {
-	    		  warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
-	    		  warnLabel.setText(warning);
-	    		  return;
-	    	  }
-	    	  
-	    	  if (chckbxToTextFile.isSelected()) {
-		    	String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
-		    	outputDirectory = fc.getSelectedFile().getAbsolutePath();
-				outputDirectory += "\\CAT " + dateTime + ".txt";
-	    	  }
-			
-	    	  Reader reader = new Reader();
+			boolean userSelectionsAreValid = validateUserSelections();
+			if (!userSelectionsAreValid) return;
 
-	    		if (chckbxToConsole.isSelected()) {
-	    			PopUp pop = popup();
-	    			try {
-						reader.parseLog(inputDirectory, pop, rdbtnErrorsOnly.isSelected());
-						pop.setVisible(true);
-					} catch (FileNotFoundException e1) {
-						System.out.println("Something went terrribly wrong. Sorry about that.");
+			initializeOutput();
+
+			Reader reader = new Reader();
+			int numberOfEntries = 0;
+			String warning = "";
+
+			numberOfEntries = reader.parseLog(inputDirectory, pop, outputDirectory, rdbtnErrorsOnly.isSelected(),
+					chckbxToConsole.isSelected(), chckbxToTextFile.isSelected());
+
+			if (numberOfEntries == 0) {
+				if (chckbxToConsole.isSelected() && pop != null) {
+					pop.dispose();
+				}
+				if (chckbxToTextFile.isSelected()) {
+					File fl = new File(outputDirectory);
+					try {
+						fl.delete();
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					}
-		    	}
-		    	  
-		    	if (chckbxToTextFile.isSelected()) {
-		    		try {
-						reader.parseLog(inputDirectory, outputDirectory, rdbtnErrorsOnly.isSelected());
-					} catch (FileNotFoundException e1) {
-						System.out.println("Something went terrribly wrong. Sorry about that.");
-					}
-		    	}
-	      }
+				}
+				warning = "<html><div style='text-align:center; color:red'>No records found</div></html>";
+				warnLabel.setText(warning);
+			}
+
+			else {
+				if (chckbxToConsole.isSelected() && pop != null) {
+					pop.setVisible(true);
+				}
+				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries
+						+ " records found</div></html>";
+				warnLabel.setText(warning);
+			}
+
+		}
 	}
 	
+	/**
+	 * Inner class to initialize search when the 'search' button is pressed.
+	 *
+	 */
 	class SearchListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			String warning = "";
-	    	  warnLabel.setText(warning);
-	    	  outputWarnLbl.setText("");
-			  modeWarnLbl.setText("");
-	    	  
-	    	  if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
-	    		  outputWarnLbl.setText("Select output");
-	    	  }
-	    	  if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
-	    		  modeWarnLbl.setText("Select mode");
-	    	  }
-	    	  if (chckbxToTextFile.isSelected() && outputDirectory == null) {
-	    		  warning += "Please select output directory<br>";
-	    	  }
-	    	  if (inputDirectory == null) {
-	    		  warning += "Please select input directory<br>";
-	    	  }
-	    	  
-	    	  String option = (String) comboBox.getSelectedItem();
-	    	  
-	    	  switch (option) {
-	    	  	case "---------------":
-	    	  		warning += "Please select search option<br>";
-	    	  		break;
-				case "general": 
-					if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
-						warning += "Please enter search term<br>";
-					}
-					break;
-				case "error type": 
-					/*
-					if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
-						warning += "Please enter error type<br>";
-					}; 
-					*/
-				break;
-				case "time range": 
-					if (textField_3.getText() == null || textField_4.getText() == null) {
-						warning += "Please enter time range<br>";
-						break;
-					}
-					String from = textField_3.getText();
-					String till = textField_4.getText();
-					if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
-						warning += "Incorrect format of time range<br>";
-					}
-					break;
-				}
+			boolean userSelectionsAreValid = validateUserSelections();
+			if (!userSelectionsAreValid) return;
 			
-	    	  if (!warning.equals("")) {
-	    		  warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
-	    		  warnLabel.setText(warning);
-	    		  return;
-	    	  }
-	    	  
-	    	if (chckbxToTextFile.isSelected()) {
-			    String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
-			    outputDirectory = fc.getSelectedFile().getAbsolutePath();
-				outputDirectory += "\\CAT " + dateTime + ".txt";
-		    }
-	    	PopUp pop = null;
-			if (chckbxToConsole.isSelected()) {
-				pop = popup();
-			}
-	    	
-			Searcher finder = new Searcher();
+			boolean searchOptionIsValid = validateSearchOption();
+			if (!searchOptionIsValid) return;
+			
 			String term = "";
+			
+			String option = (String) comboBox.getSelectedItem();
 			
 			switch (option) {
 			case "general": term = textField_1.getText(); break;
@@ -542,36 +483,46 @@ public class Frame {
 				String till = textField_4.getText().trim();
 				term = from + "\n" + till; 
 				break;
-			default: System.out.println("Wrong 'search by' option");
+			default: JOptionPane.showMessageDialog(null, "'Search by' option does not match any of the supported options", "Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
-			int numberOfEntries = -4;
-			
-			try {
-				numberOfEntries = finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
-			} catch (FileNotFoundException e1) {
-				System.out.println("Something went terrribly wrong. Sorry about that.");
-			}
+			int numberOfEntries = 0;
+			String warning = "";
+	    	
+			initializeOutput();
+			Searcher finder = new Searcher();
+			numberOfEntries = finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
 			
 			if (numberOfEntries == 0) {
-				if (pop != null) {
+				if (chckbxToConsole.isSelected() && pop != null) {
 					pop.dispose();
 				}
 				if (chckbxToTextFile.isSelected()) {
 					File fl = new File(outputDirectory);
-					fl.delete();
+					try {
+						fl.delete();
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 				warning = "<html><div style='text-align:center; color:red'>No records found</div></html>";
 	    		warnLabel.setText(warning);
 			}
 			else {
-				pop.setVisible(true);
+				if (pop != null && chckbxToConsole.isSelected()) {
+					pop.setVisible(true);
+				}
 				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries + " records found</div></html>";
 	    		warnLabel.setText(warning);
 			}
 		}
+
 	}
 	
+	/**
+	 * Inner class to monitor the user's choice in the 'search type' drop-down menu and lock the fields that will not be used.
+	 *
+	 */
 	class SearchOptionListener implements ActionListener {
 	      public void actionPerformed(ActionEvent e) {
 	    	  
@@ -605,52 +556,165 @@ public class Frame {
 	      }
 	}
 	
+	/**
+	 * A helper method to check if a string contains valid date and time that match the format 'MM/DD/YYYY HH:MM:SS'.
+	 * @param dateTime a string containing date and time
+	 * @return true if date and time are valid, false otherwise
+	 */
+   private boolean checkDateTimeFormat(String dateTime) {
 
-	   private boolean checkDateTimeFormat(String dateTime) {
+	    String re1="(\\d+)";	// Integer
+	    String re2="(\\/)";	// slash
+	    String re3="((?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])";	// Day
+	    String re4="(\\/)";	// slash
+	    String re5="((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])";	// Year
+	    String re6="( )";	// White Space 1
+	    String re7="((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)";	// HourMinuteSec
 
-		    String re1="(\\d+)";	// Integer Number 1
-		    String re2="(\\/)";	// Any Single Character 1
-		    String re3="((?:(?:[0-2]?\\d{1})|(?:[3][01]{1})))(?![\\d])";	// Day 1
-		    String re4="(\\/)";	// Any Single Character 2
-		    String re5="((?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])";	// Year 1
-		    String re6="( )";	// White Space 1
-		    String re7="((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)";	// HourMinuteSec 1
-
-		    Pattern p = Pattern.compile(re1+re2+re3+re4+re5+re6+re7,Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-		    Matcher m = p.matcher(dateTime);
-
-		    return m.matches();
-	   }
+	    Pattern p = Pattern.compile(re1+re2+re3+re4+re5+re6+re7,Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+	    Matcher m = p.matcher(dateTime);
+	    
+	    return m.matches();
+   }
+   
+   /**
+    * A helper method that sets makes all fields in the search area uneditable; used by the SearchOptionListener inner class.
+    */
+   private void lockFields() {
+	   	textField_1.setText("");
+	    textField_1.setEditable(false);
+	    textField_3.setText("");
+	    textField_3.setEditable(false);
+	    textField_4.setText("");
+	    textField_4.setEditable(false);
+	    comboBox_1.setEnabled(false);
+	    comboBox_2.setEnabled(false);
+	    comboBox_3.setEnabled(false);
+	    comboBox_4.setEnabled(false);
+	    comboBox_5.setEnabled(false); 
+	    comboBox_6.setEnabled(false);
+   }
 	   
-	   private void lockFields() {
-		   	textField_1.setText("");
-		    textField_1.setEditable(false);
-		    textField_3.setText("");
-		    textField_3.setEditable(false);
-		    textField_4.setText("");
-		    textField_4.setEditable(false);
-		    comboBox_1.setEnabled(false);
-		    comboBox_2.setEnabled(false);
-		    comboBox_3.setEnabled(false);
-		    comboBox_4.setEnabled(false);
-		    comboBox_5.setEnabled(false); 
-		    comboBox_6.setEnabled(false);
-	   }
+   /**
+    * A helper method to check if the user has made valid selections in the upper box of the GUI; used by the SearchListener and OutputGenerator classes.
+    * @return true if the user has made all necessary selections and they are valid, false otherwise
+    */
+	private boolean validateUserSelections() {
+
+		String warning = "";
+		boolean modeAndDestinationChosen = true;
+
+		warnLabel.setText(warning);
+		outputWarnLbl.setText("");
+		modeWarnLbl.setText("");
+
+		if (!chckbxToConsole.isSelected() && !chckbxToTextFile.isSelected()) {
+			outputWarnLbl.setText("Select output");
+			modeAndDestinationChosen = false;
+		}
+		if (!rdbtnErrorsOnly.isSelected() && !rdbtnAllRecords.isSelected()) {
+			modeWarnLbl.setText("Select mode");
+			modeAndDestinationChosen = false;
+		}
+		if (chckbxToTextFile.isSelected() && outputDirectory == null) {
+			warning += "Please select output directory<br>";
+		}
+		if (inputDirectory == null) {
+			warning += "Please select input directory<br>";
+		}
+
+		if (!warning.equals("")) {
+			warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
+			warnLabel.setText(warning);
+			return false;
+		}
+		if (!modeAndDestinationChosen) {return false;}
+
+		return true;
+	}
+	
+   /**
+    * A helper method to check if the user has made valid selections in the search area of the GUI; used by the SearchListener class.
+    * @return true if the user has made all necessary selections and they are valid, false otherwise
+    */
+	private boolean validateSearchOption() {
+
+		String warning = "";
+		String option = (String) comboBox.getSelectedItem();
+
+		switch (option) {
+
+		case "---------------":
+			warning += "Please select search option<br>";
+			break;
+
+		case "general":
+			if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
+				warning += "Please enter search term<br>";
+			}
+			break;
+
+		case "error type":
+			break;
+
+		case "time range":
+			if (textField_3.getText() == null || textField_4.getText() == null) {
+				warning += "Please enter time range<br>";
+				break;
+			}
+
+			String from = textField_3.getText().trim();
+			String till = textField_4.getText().trim();
+			if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
+				warning += "Incorrect format of time range<br>";
+			}
+			break;
+		}
+		
+		if (!warning.equals("")) {
+			warning = "<html><div style='text-align:center; color:red'>" + warning + "</div></html>";
+			warnLabel.setText(warning);
+			return false;
+		}
+		
+		return true;
+	}
 	   
-	   private PopUp popup() {
-		   PopUp frame = null;
-					try {
-						frame = new PopUp();
-						frame.setVisible(false);
-						
-						java.net.URL iconURL = getClass().getResource("cat-paw.png");
-						ImageIcon icon = new ImageIcon(iconURL);
-						frame.setIconImage(icon.getImage());
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-			return frame;
-	   }
+	/**
+	 * A helper method to initialize an output object.
+	 * Creates a text file if the user has chosen to direct the output to a text file, 
+	 * and an object of the PopUp class if the user has chosen to direct the output to console.
+	 */
+	private void initializeOutput() {
+		if (chckbxToTextFile.isSelected()) {
+		    String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
+		    outputDirectory = fc.getSelectedFile().getAbsolutePath();
+			outputDirectory += "\\CAT " + dateTime + ".txt";
+	    }
+    	
+		if (chckbxToConsole.isSelected()) {
+			pop = popup();
+		}
+	}
+	
+	/**
+	 * A helper method to create and initialize an object of the PopUp class.
+	 * @return a frame created by the PopUp class
+	 */
+	private PopUp popup() {
+		PopUp frame = null;
+		try {
+			frame = new PopUp();
+			frame.setVisible(false);
+
+			java.net.URL iconURL = getClass().getResource("cat-paw.png");
+			ImageIcon icon = new ImageIcon(iconURL);
+			frame.setIconImage(icon.getImage());
+
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+		}
+		return frame;
+	}
 
 }

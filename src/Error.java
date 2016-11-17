@@ -2,6 +2,8 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+
 public class Error {
 	
 	private String originalMessage;
@@ -42,7 +44,7 @@ public class Error {
 			this.time = split[1];
 
 		} catch (Exception e) {
-			System.out.println("Error parsing date and time in line:" + brk + errorLine);
+			JOptionPane.showMessageDialog(null, "Error parsing date and time in line:" + brk + errorLine, "Error", JOptionPane.ERROR_MESSAGE);
 		}	
 	}
 		
@@ -55,8 +57,7 @@ public class Error {
 			this.time = splitLine2[1];
 		} 
 		catch (Exception e) {
-
-			System.out.println("Error parsing date and time in line:" + brk + errorLine);
+			JOptionPane.showMessageDialog(null, "Error parsing date and time in line:" + brk + errorLine, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		
 			int blrLocation = statusLine.indexOf("BLR=");
@@ -162,7 +163,7 @@ public class Error {
 	}
 	
 	public boolean contains(String searchTerm) {
-		if ((originalMessage != null && originalMessage.toLowerCase().contains(searchTerm.toLowerCase()) || (originalStatus != null && originalStatus.toLowerCase().contains(searchTerm.toLowerCase())))) {
+		if (this.toString().contains(searchTerm)) {
 			return true;
 		}
 		return false;
@@ -180,7 +181,7 @@ public class Error {
 			GregorianCalendar dateTime = new GregorianCalendar(Integer.parseInt(tmpDate[2]), Integer.parseInt(tmpDate[0]), Integer.parseInt(tmpDate[1]), Integer.parseInt(tmpTime[0]), Integer.parseInt(tmpTime[1]), Integer.parseInt(tmpTime[2]));
 			return dateTime;
 		} catch (Exception e) {
-			System.out.println("Error parsing date and time");
+			JOptionPane.showMessageDialog(null, "Error parsing date and time: " + date + " " + time, "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		return null;
 	}

@@ -1,33 +1,51 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.Scanner;
-
+import javax.swing.JOptionPane;
+/**
+ * The Searcher class implements the search function.
+ * 
+ */
 public class Searcher {
 
 	private static String brk = System.lineSeparator();
 	
-	public int search(String searchType, String inputDirectory, String outputDirectory, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) throws FileNotFoundException {
+	/**
+	 * Implements the search function by going through all files inside the specified directory whose name start with 'control'; all other files are ignored. 
+	 * Depending on the value of the errorsOnly parameter, the search will be performed either on all raw data (if errorsOnly is false),
+	 * or on all error-related records only (if errorsOnly is true). Creates a Scanner object to iterate through every line of the control files 
+	 * and uses the lineContainsTerm() method to determine if the line contains the search term.
+	 * Prints all found data to a text file and/or a text window as specified by the user.
+	 * @param searchType a string to specify the type of the search to be performed
+	 * @param inputDirectory a path to the directory containing the log files to be searched
+	 * @param outputDirectory a path to the directory in which an output text file is to be created
+	 * @param term a string containing the search term
+	 * @param errorsOnly a boolean specifying whether the search should be performed on error messages only
+	 * @param toTextFile a boolean specifying whether the output should be directed to a text file
+	 * @param toConsole a boolean specifying whether the output should be directed to an output window
+	 * @param pop an output window
+	 * @return the number of records found
+	 */
+	public int search(String searchType, String inputDirectory, String outputDirectory, String term, boolean errorsOnly, boolean toTextFile, boolean toConsole, PopUp pop) {
 		
 		File dir = new File(inputDirectory);
-		PrintWriter writer = null;					// do something about null pops
+		File[] directoryListing = dir.listFiles();
+		PrintWriter writer = null;				
 		
-		if (toTextFile && (outputDirectory == null || outputDirectory.isEmpty())) {
-			pop.addText("No output directory!");
-			return -3;
-		}
-		
-		if (toTextFile && outputDirectory != null && !outputDirectory.isEmpty()) {
+		if (toTextFile) {
 			File output = new File(outputDirectory);
-			writer = new PrintWriter(output);
+			try {
+				writer = new PrintWriter(output);
+			} catch (FileNotFoundException e) {
+				JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				return 0;
+			}
 		}
 		
 		int numberOfRecords = 0;
-		
-		  File[] directoryListing = dir.listFiles();
-		
+
 		  if (directoryListing != null) {
 		    for (File log : directoryListing) {
 		    	
@@ -36,7 +54,14 @@ public class Searcher {
 		    	if (log.getName().substring(0, 7).equals("control")) {
 		    		String searchTerm = term.trim().toLowerCase();
 		    		
-		    		Scanner reader = new Scanner(log);
+		    		Scanner reader = null;
+					try {
+						reader = new Scanner(log);
+					} catch (FileNotFoundException e) {
+						JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						return 0;
+					}
+					
 		    		String previous = "";
 
 		    		while (reader.hasNextLine()) {
@@ -91,6 +116,13 @@ public class Searcher {
 		  return numberOfRecords;
 	}
 
+	/**
+	 * Determines if the given string contains the given search term. Used in 'all records' mode.
+	 * @param searchType a string to specify the type of the search to be performed
+	 * @param searchTerm a string containing the search term
+	 * @param line a string to be searched
+	 * @return true if line contains searchTerm, false otherwise
+	 */
 	public boolean lineContainsTerm(String searchType, String searchTerm, String line) {
 		
 		switch (searchType) {
@@ -106,7 +138,6 @@ public class Searcher {
 				}
 				return matchFound;
 			}
-			// no need for break since there is a return statement (?)
 			
 			case "error type": {
 				return line.toLowerCase().contains(searchTerm);
@@ -129,19 +160,20 @@ public class Searcher {
 					start = parseDateTime(tmp[0]);
 					finish = parseDateTime(tmp[1]);
 				} catch (Exception e) {
-					System.out.println("Error parsing date and time: " + searchTerm);
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 				
 				String[] tmp = line.split(" ");
-				if (tmp.length < 2) return false; //fix!
+				if (tmp.length < 2) return false; 
+
 				String dateAndTime = tmp[0] + " " + tmp[1];
 				GregorianCalendar lineDateTime;
 				
 				try {
 					lineDateTime = parseDateTime(dateAndTime);
 				} catch (Exception e) {
-					System.out.println("Error parsing date and time: " + dateAndTime);
-					return false;														// fix!
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					return false;														
 				}
 				
 				return (start.compareTo(lineDateTime) <= 0 && finish.compareTo(lineDateTime) >= 0);
@@ -154,6 +186,13 @@ public class Searcher {
 		}
 	}
 	
+	/**
+	 * Determines if the given error contains the given search term. Used in 'errors only' mode
+	 * @param searchType a string to specify the type of the search to be performed
+	 * @param searchTerm a string containing the search term
+	 * @param error the error object to be searched
+	 * @return true if error contains searchTerm, false otherwise
+	 */
 	public boolean errorContainsTerm(String searchType, String searchTerm, Error error) {
 		
 		switch (searchType) {
@@ -198,6 +237,11 @@ public class Searcher {
 		}
 	}
 	
+	/**
+	 * Parses a string containing date and time and constructs an appropriate Calendar object
+	 * @param dateTime a string containing date and time
+	 * @return a GregorianCalendar object matching the specified date and time
+	 */
 	private GregorianCalendar parseDateTime(String dateTime) {
 		
 		String[] tmp = dateTime.split(" ");
