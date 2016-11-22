@@ -40,7 +40,8 @@ public class Frame {
 	private JCheckBox chckbxToTextFile;
 	private JRadioButton rdbtnErrorsOnly;
 	private JRadioButton rdbtnAllRecords;
-	private JFileChooser fc = new JFileChooser();
+	private JFileChooser fcIn;
+	private JFileChooser fcOut;
     private JTextField textField;
     private JTextField textField_2;
     private String inputDirectory;
@@ -168,7 +169,6 @@ public class Frame {
 	    panel_5.setBorder(null);
 	    panel_1.add(panel_5);
 	    
-		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	    panel_5.setLayout(new GridLayout(2,0));
 	    
 	    JPanel panel_15 = new JPanel();
@@ -185,16 +185,18 @@ public class Frame {
 	    textField.setPreferredSize(new Dimension(510, 25));
 	    panel_15.add(textField);
 	    textField.setEditable(false);
-	    
+	    JFileChooser fcIn = new JFileChooser();
+	    fcIn.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	    
 	    btnInputFolder.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e)
 	    	{
-	    	    int returnValue = fc.showOpenDialog(new JFrame());
+	    		
+	    	    int returnValue = fcIn.showOpenDialog(new JFrame());
 	    	    
 	    	    if(returnValue == JFileChooser.APPROVE_OPTION)
 	    	    {
-	    	    	inputDirectory = fc.getSelectedFile().getAbsolutePath();
+	    	    	inputDirectory = fcIn.getSelectedFile().getAbsolutePath();
 	    	    	textField.setText(inputDirectory);
 	    	    }
 	    	}
@@ -214,15 +216,18 @@ public class Frame {
 	    textField_2.setPreferredSize(new Dimension(510, 25));
 	    panel_16.add(textField_2);
 	    textField_2.setEditable(false);
+	    fcOut = new JFileChooser();
+	    fcOut.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	    
 	    btnOutputFolder.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e)
 	    	{
-	    	    int returnValue = fc.showOpenDialog(new JFrame());
+	    		
+	    	    int returnValue = fcOut.showOpenDialog(new JFrame());
 	    	    
-	    	    if(returnValue == JFileChooser.APPROVE_OPTION && fc.getSelectedFile() != null)
+	    	    if(returnValue == JFileChooser.APPROVE_OPTION && fcOut.getSelectedFile() != null)
 	    	    {
-	    	    	outputDirectory = fc.getSelectedFile().getAbsolutePath();
+	    	    	outputDirectory = fcOut.getSelectedFile().getAbsolutePath();
 	    	    	textField_2.setText(outputDirectory);
 	    	    }
 	    	}
@@ -687,7 +692,7 @@ public class Frame {
 	private void initializeOutput() {
 		if (chckbxToTextFile.isSelected()) {
 		    String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
-		    outputDirectory = fc.getSelectedFile().getAbsolutePath();
+		    outputDirectory = fcOut.getSelectedFile().getAbsolutePath();
 			outputDirectory += "\\CAT " + dateTime + ".txt";
 	    }
     	
