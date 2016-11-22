@@ -14,7 +14,7 @@ public class Searcher {
 	
 	/**
 	 * Implements the search function by going through all files inside the specified directory whose name start with 'control'; all other files are ignored. 
-	 * Depending on the value of the errorsOnly parameter, the search will be performed either on all raw data (if errorsOnly is false),
+	 * Depending on the value of the errorsOnly argument, the search will be performed either on all raw data (if errorsOnly is false),
 	 * or on all error-related records only (if errorsOnly is true). Creates a Scanner object to iterate through every line of the control files 
 	 * and uses the lineContainsTerm() method to determine if the line contains the search term.
 	 * Prints all found data to a text file and/or a text window as specified by the user.

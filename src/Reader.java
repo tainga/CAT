@@ -13,7 +13,7 @@ public class Reader {
 	
 	/**
 	 * Compiles a report by going through all files inside the specified directory whose name start with 'control'; all other files are ignored.
-	 * Depending on the value of the errorsOnly parameter, the report will contain either all raw data (if errorsOnly is false),
+	 * Depending on the value of the errorsOnly argument, the report will contain either all raw data (if errorsOnly is false),
 	 * or all error-related records only (if errorsOnly is true). Prints all found data to a text file and/or a text window as specified by the user.	
 	 * @param inputDirectory a path to the directory containing the log files
 	 * @param pop an output window
@@ -125,7 +125,7 @@ public class Reader {
 	}
 	
 	/**
-	 * Constructs an error object based on the error information contained in the lines passed as the parameters
+	 * Constructs an error object based on the error information contained in the lines passed as the arguments
 	 * @param statLine a string containing the status message preceding the error message
 	 * @param errorLine a string containing the error message
 	 * @return an Error object based on the information from the error and status lines
