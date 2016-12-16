@@ -35,29 +35,29 @@ import java.awt.SystemColor;
 public class Frame {
 
 	JFrame frame;
-	private JTextField textField_1;
+	private JTextField searchTerm_textField;
 	private JCheckBox chckbxToConsole;
 	private JCheckBox chckbxToTextFile;
 	private JRadioButton rdbtnErrorsOnly;
 	private JRadioButton rdbtnAllRecords;
 	private JFileChooser fcIn;
 	private JFileChooser fcOut;
-    private JTextField textField;
-    private JTextField textField_2;
+    private JTextField inputFolder_textField;
+    private JTextField outputFolder_textField;
     private String inputDirectory;
     private String outputDirectory;
     private JLabel warnLabel;
     private JLabel outputWarnLbl;
     private JLabel modeWarnLbl;
-    private JTextField textField_3;
-    private JTextField textField_4;
-	private JComboBox<String> comboBox;
-	private JComboBox<Integer> comboBox_1;
-	private JComboBox<Integer> comboBox_2;
-	private JComboBox<Integer> comboBox_3;
-	private JComboBox<Integer> comboBox_4;
-	private JComboBox<Integer> comboBox_5;
-	private JComboBox<String> comboBox_6;
+    private JTextField timeFrameFrom_textField;
+    private JTextField timeFrameTo_textField;
+	private JComboBox<String> searchBy_comboBox;
+	private JComboBox<Integer> locationRack_comboBox;
+	private JComboBox<Integer> locationModule_comboBox;
+	private JComboBox<Integer> locationLine_comboBox;
+	private JComboBox<Integer> sensorModule_comboBox;
+	private JComboBox<Integer> sensorLine_comboBox;
+	private JComboBox<String> errorType_comboBox;
 	private PopUp pop;
 
 
@@ -72,120 +72,235 @@ public class Frame {
 	 * A helper method to initialize the components of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 680, 480);
-		frame.setTitle("CAT");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		initFrame();
 		
-		java.net.URL iconURL = getClass().getResource("cat-paw.png");
-		ImageIcon icon = new ImageIcon(iconURL);
-		frame.setIconImage(icon.getImage());
-		
-		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, BorderLayout.NORTH);
+		JPanel titlePanel = new JPanel();
+		frame.getContentPane().add(titlePanel, BorderLayout.NORTH);
 		
 		JLabel lblCgwAnalysisTool = new JLabel("CGW Analysis Tool");
-		panel.add(lblCgwAnalysisTool);
+		titlePanel.add(lblCgwAnalysisTool);
 		
-		JPanel panel_2 = new JPanel();
-		frame.getContentPane().add(panel_2, BorderLayout.CENTER);
-		panel_2.setLayout(new BorderLayout(0, 0));
+		JPanel mainPanel = new JPanel();
+		frame.getContentPane().add(mainPanel, BorderLayout.CENTER);
+		mainPanel.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(null);
-		panel_2.add(panel_1, BorderLayout.CENTER);
+		JPanel mainSubPanel = new JPanel();
+		mainSubPanel.setBorder(null);
+		mainPanel.add(mainSubPanel, BorderLayout.CENTER);
+	    mainSubPanel.setLayout(new BoxLayout(mainSubPanel, BoxLayout.Y_AXIS));
 	    
-		ButtonGroup group1 = new ButtonGroup();
-	    panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.Y_AXIS));
+	    initOptionsPanel(mainSubPanel);
 	    
-	    JPanel panel_18 = new JPanel();
-	    panel_1.add(panel_18);
-	    panel_18.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+	    initIOPanel(mainSubPanel);
 	    
-	    JPanel panel_4 = new JPanel();
-	    panel_18.add(panel_4);
-	    panel_4.setPreferredSize(new Dimension(664, 80));
-	    panel_4.setBorder(new LineBorder(SystemColor.activeCaption, 2));
-	    panel_4.setLayout(new GridLayout(0, 6, 0, 0));
+	    initSearchAndReportPanel(mainSubPanel);
 	    
-	    Component horizontalGlue_1 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_1);
+	    JPanel warningsPanel = new JPanel();
+	    warningsPanel.setPreferredSize(new Dimension(640, 60));
+	    mainSubPanel.add(warningsPanel);
 	    
-	    Component horizontalGlue_9 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_9);
+	    warnLabel = new JLabel("");
+	    warningsPanel.add(warnLabel);
+		
+		JPanel copyrightPanel = new JPanel();
+		frame.getContentPane().add(copyrightPanel, BorderLayout.SOUTH);
+		
+		JLabel lblcopy = new JLabel("\u00a9 2016");
+		copyrightPanel.add(lblcopy);	
+		
+
+	}
+
+	/**
+	 * @param mainSubPanel
+	 */
+	private void initSearchAndReportPanel(JPanel mainSubPanel) {
+		JPanel searchAndReport_panel = new JPanel();
+	    mainSubPanel.add(searchAndReport_panel);
+	    searchAndReport_panel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 	    
-	    JLabel lblOutput = new JLabel("Output:");
-	    panel_4.add(lblOutput);
+	    JPanel reportPanel = new JPanel();
+	    reportPanel.setBorder(new LineBorder(new Color(153, 180, 209), 2));
+	    searchAndReport_panel.add(reportPanel);
+	    reportPanel.setLayout(new BorderLayout(0, 0));
+	    reportPanel.setPreferredSize(new Dimension(150, 170));
 	    
-	    Component horizontalGlue_2 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_2);
+	    JLabel lblGenerateReport = new JLabel("Generate Report");
+	    lblGenerateReport.setHorizontalAlignment(SwingConstants.CENTER);
+	    reportPanel.add(lblGenerateReport);
 	    
-	    JLabel lblInclude = new JLabel("Include:");
-	    panel_4.add(lblInclude);
+	    JPanel generateButtonPanel = new JPanel();
+	    reportPanel.add(generateButtonPanel, BorderLayout.SOUTH);
 	    
-	    Component horizontalGlue_3 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_3);
+	    JButton btnGenerate = new JButton("");
+	    JLabel generateLbl = new JLabel("Generate");
+	    btnGenerate.add(generateLbl);
+	    btnGenerate.addActionListener(new OutputGenerator());
+	    generateButtonPanel.add(btnGenerate);
 	    
-	    outputWarnLbl = new JLabel("");
-	    outputWarnLbl.setForeground(Color.red);
-	    panel_4.add(outputWarnLbl);
+	    JPanel searchPanel = new JPanel();
+	    searchPanel.setPreferredSize(new Dimension(510, 170));
+	    searchPanel.setBorder(new LineBorder(SystemColor.activeCaption, 2));
+	    searchAndReport_panel.add(searchPanel);
+	    searchPanel.setLayout(new BorderLayout(0, 0));
 	    
-	    Component horizontalGlue_10 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_10);
+	    JPanel searchOptionsPanel = new JPanel();
+	    searchPanel.add(searchOptionsPanel, BorderLayout.CENTER);
+	    searchOptionsPanel.setLayout(new BoxLayout(searchOptionsPanel, BoxLayout.Y_AXIS));
 	    
-	    chckbxToConsole = new JCheckBox("to console");
-	    panel_4.add(chckbxToConsole); 
+	    JPanel searchByPanel = new JPanel();
+	    searchOptionsPanel.add(searchByPanel);
 	    
-	    Component horizontalGlue_5 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_5);
+	    JLabel lblSearchBy = new JLabel("Search by ");
+	    searchByPanel.add(lblSearchBy);
 	    
-	    rdbtnErrorsOnly = new JRadioButton("errors only");
-	    panel_4.add(rdbtnErrorsOnly);
-	    group1.add(rdbtnErrorsOnly);
+	    searchBy_comboBox = new JComboBox<String>();
+	    searchByPanel.add(searchBy_comboBox);
 	    
-	    Component horizontalGlue_6 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_6);
+	    searchBy_comboBox.addItem("---------------");
+	    searchBy_comboBox.addItem("general");
+	    searchBy_comboBox.addItem("error type");
+	    searchBy_comboBox.addItem("location");
+	    searchBy_comboBox.addItem("sensor");
+	    searchBy_comboBox.addItem("time range");
 	    
-	    modeWarnLbl = new JLabel("");
-	    modeWarnLbl.setForeground(Color.red);
-	    panel_4.add(modeWarnLbl);
+	    JPanel searchTermError_panel = new JPanel();
+	    FlowLayout flowLayout = (FlowLayout) searchTermError_panel.getLayout();
+	    flowLayout.setAlignment(FlowLayout.LEFT);
+	    searchOptionsPanel.add(searchTermError_panel);
 	    
-	    Component horizontalGlue_11 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_11);
+	    JLabel lblEnterSearchTerm = new JLabel("Search term:");
+	    searchTermError_panel.add(lblEnterSearchTerm);
 	    
-	    chckbxToTextFile = new JCheckBox("to text file");
-	    panel_4.add(chckbxToTextFile);
+	    searchTerm_textField = new JTextField();
+	    searchTerm_textField.setColumns(16);
+	    searchTerm_textField.addActionListener(new SearchListener());
+	    searchTermError_panel.add(searchTerm_textField);
 	    
-	    Component horizontalGlue_8 = Box.createHorizontalGlue();
-	    panel_4.add(horizontalGlue_8);
+	    Component horizontalStrut = Box.createHorizontalStrut(20);
+	    searchTermError_panel.add(horizontalStrut);
 	    
-	    rdbtnAllRecords = new JRadioButton("all records");
-	    panel_4.add(rdbtnAllRecords);
-	    group1.add(rdbtnAllRecords);
+	    JLabel lblError = new JLabel("Error:");
+	    searchTermError_panel.add(lblError);
 	    
-	    JPanel panel_5 = new JPanel();
-	    panel_5.setBorder(null);
-	    panel_1.add(panel_5);
+	    errorType_comboBox = new JComboBox<String>();
+	    errorType_comboBox.addItem("data loss");
+	    errorType_comboBox.addItem("idle miss");
+	    errorType_comboBox.addItem("parity");
+	    searchTermError_panel.add(errorType_comboBox);
 	    
-	    panel_5.setLayout(new GridLayout(2,0));
+	    JPanel locationSensorPanel = new JPanel();
+	    searchOptionsPanel.add(locationSensorPanel);
 	    
-	    JPanel panel_15 = new JPanel();
-	    panel_5.add(panel_15);
-	    panel_15.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+	    JLabel lblLocation = new JLabel("Location (rack/module/line):");
+	    locationSensorPanel.add(lblLocation);
+	    
+	    locationRack_comboBox = new JComboBox<Integer>();
+	    locationRack_comboBox.addItem(0);
+	    locationRack_comboBox.addItem(1);
+	    locationRack_comboBox.addItem(2);
+	    locationRack_comboBox.addItem(3);
+	    locationSensorPanel.add(locationRack_comboBox);
+	    
+	    locationModule_comboBox = new JComboBox<Integer>();
+	    locationModule_comboBox.addItem(0);
+	    locationModule_comboBox.addItem(1);
+	    locationModule_comboBox.addItem(2);
+	    locationModule_comboBox.addItem(3);
+	    locationModule_comboBox.addItem(4);
+	    locationModule_comboBox.addItem(5);
+	    locationSensorPanel.add(locationModule_comboBox);
+	    
+	    locationLine_comboBox = new JComboBox<Integer>();
+	    locationLine_comboBox.addItem(0);
+	    locationLine_comboBox.addItem(1);
+	    locationLine_comboBox.addItem(2);
+	    locationLine_comboBox.addItem(3);
+	    locationSensorPanel.add(locationLine_comboBox);
+
+	    JLabel lblSensorModuleLine = new JLabel("   Sensor (module/line):");
+	    locationSensorPanel.add(lblSensorModuleLine);
+	    
+	    sensorModule_comboBox = new JComboBox<Integer>();
+	    sensorModule_comboBox.addItem(0);
+	    sensorModule_comboBox.addItem(1);
+	    sensorModule_comboBox.addItem(2);
+	    sensorModule_comboBox.addItem(3);
+	    sensorModule_comboBox.addItem(4);
+	    sensorModule_comboBox.addItem(5);
+	    locationSensorPanel.add(sensorModule_comboBox);
+	    
+	    sensorLine_comboBox = new JComboBox<Integer>();
+	    sensorLine_comboBox.addItem(0);
+	    sensorLine_comboBox.addItem(1);
+	    sensorLine_comboBox.addItem(2);
+	    sensorLine_comboBox.addItem(3);
+	    locationSensorPanel.add(sensorLine_comboBox);
+	    
+	    JPanel timeFramePanel = new JPanel();
+	    searchOptionsPanel.add(timeFramePanel);
+	    timeFramePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+	    
+	    JLabel lblTimeFrameFrom = new JLabel("Time Frame:   from");
+	    timeFramePanel.add(lblTimeFrameFrom);
+	    
+	    timeFrameFrom_textField = new JTextField();
+	    timeFramePanel.add(timeFrameFrom_textField);
+	    timeFrameFrom_textField.setColumns(10);
+	    
+	    JLabel lblTo = new JLabel("to");
+	    timeFramePanel.add(lblTo);
+	    
+	    timeFrameTo_textField = new JTextField();
+	    timeFrameTo_textField.setColumns(10);
+
+	    timeFramePanel.add(timeFrameTo_textField);
+	    
+	    JLabel lblEx = new JLabel("ex.: 6/27/2016 13:40:46");
+	    lblEx.setForeground(SystemColor.windowBorder);
+	    timeFramePanel.add(lblEx);
+	    
+	    Component horizontalGlue = Box.createHorizontalGlue();
+	    timeFramePanel.add(horizontalGlue);
+	    
+	    JPanel SearchButtonPanel = new JPanel();
+	    searchPanel.add(SearchButtonPanel, BorderLayout.SOUTH);
+	    
+	    JButton btnSearch = new JButton("");
+	    JLabel searchLbl = new JLabel("Search");
+	    btnSearch.add(searchLbl);
+
+	    SearchButtonPanel.add(btnSearch);	    
+	    
+	    searchTerm_textField.addActionListener(new SearchListener());
+	    timeFrameTo_textField.addActionListener(new SearchListener());
+	    btnSearch.addActionListener(new SearchListener());
+	    searchBy_comboBox.addActionListener(new SearchOptionListener());
+		lockFields();
+	}
+
+	private void initIOPanel(JPanel mainSubPanel) {
+		JPanel inputOutputPanel = new JPanel();
+	    inputOutputPanel.setBorder(null);
+	    mainSubPanel.add(inputOutputPanel);
+	    
+	    inputOutputPanel.setLayout(new GridLayout(2,0));
+	    
+	    JPanel inputPanel = new JPanel();
+	    inputOutputPanel.add(inputPanel);
+	    inputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 	    JButton btnInputFolder = new JButton("Input folder");
 	    btnInputFolder.setPreferredSize(new Dimension(150, 23));
-	    panel_15.add(btnInputFolder);
+	    inputPanel.add(btnInputFolder);
 	    
-	    textField = new JTextField();
-	    textField.setBorder(new LineBorder(SystemColor.activeCaption));
-	    textField.setBackground(new Color(234,240,246));
-	    textField.setPreferredSize(new Dimension(510, 25));
-	    panel_15.add(textField);
-	    textField.setEditable(false);
-	    JFileChooser fcIn = new JFileChooser();
+	    inputFolder_textField = new JTextField();
+	    inputFolder_textField.setBorder(new LineBorder(SystemColor.activeCaption));
+	    inputFolder_textField.setBackground(new Color(234,240,246));
+	    inputFolder_textField.setPreferredSize(new Dimension(510, 25));
+	    inputPanel.add(inputFolder_textField);
+	    inputFolder_textField.setEditable(false);
+	    fcIn = new JFileChooser();
 	    fcIn.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	    
 	    btnInputFolder.addActionListener(new ActionListener() {
@@ -197,25 +312,25 @@ public class Frame {
 	    	    if(returnValue == JFileChooser.APPROVE_OPTION)
 	    	    {
 	    	    	inputDirectory = fcIn.getSelectedFile().getAbsolutePath();
-	    	    	textField.setText(inputDirectory);
+	    	    	inputFolder_textField.setText(inputDirectory);
 	    	    }
 	    	}
 	    });
 	    
-	    JPanel panel_16 = new JPanel();
-	    panel_5.add(panel_16);
-	    panel_16.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+	    JPanel outputPanel = new JPanel();
+	    inputOutputPanel.add(outputPanel);
+	    outputPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 	     
 	    JButton btnOutputFolder = new JButton("Output folder");
 	    btnOutputFolder.setPreferredSize(new Dimension(150, 23));
-	    panel_16.add(btnOutputFolder);
+	    outputPanel.add(btnOutputFolder);
 	    
-	    textField_2 = new JTextField();
-	    textField_2.setBorder(new LineBorder(SystemColor.activeCaption));
-	    textField_2.setBackground(new Color(234,240,246));
-	    textField_2.setPreferredSize(new Dimension(510, 25));
-	    panel_16.add(textField_2);
-	    textField_2.setEditable(false);
+	    outputFolder_textField = new JTextField();
+	    outputFolder_textField.setBorder(new LineBorder(SystemColor.activeCaption));
+	    outputFolder_textField.setBackground(new Color(234,240,246));
+	    outputFolder_textField.setPreferredSize(new Dimension(510, 25));
+	    outputPanel.add(outputFolder_textField);
+	    outputFolder_textField.setEditable(false);
 	    fcOut = new JFileChooser();
 	    fcOut.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	    
@@ -228,186 +343,91 @@ public class Frame {
 	    	    if(returnValue == JFileChooser.APPROVE_OPTION && fcOut.getSelectedFile() != null)
 	    	    {
 	    	    	outputDirectory = fcOut.getSelectedFile().getAbsolutePath();
-	    	    	textField_2.setText(outputDirectory);
+	    	    	outputFolder_textField.setText(outputDirectory);
 	    	    }
 	    	}
 	    });
-	    
-	    JPanel panel_6 = new JPanel();
-	    panel_1.add(panel_6);
-	    panel_6.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-	    
-	    JPanel panel_7 = new JPanel();
-	    panel_7.setBorder(new LineBorder(new Color(153, 180, 209), 2));
-	    panel_6.add(panel_7);
-	    panel_7.setLayout(new BorderLayout(0, 0));
-	    panel_7.setPreferredSize(new Dimension(150, 170));
-	    
-	    JLabel lblGenerateReport = new JLabel("Generate Report");
-	    lblGenerateReport.setHorizontalAlignment(SwingConstants.CENTER);
-	    panel_7.add(lblGenerateReport);
-	    
-	    JPanel panel_11 = new JPanel();
-	    panel_7.add(panel_11, BorderLayout.SOUTH);
-	    
-	    JButton btnGenerate = new JButton("");
-	    JLabel generateLbl = new JLabel("Generate");
-	    btnGenerate.add(generateLbl);
-	    btnGenerate.addActionListener(new OutputGenerator());
-	    panel_11.add(btnGenerate);
-	    
-	    JPanel panel_8 = new JPanel();
-	    panel_8.setPreferredSize(new Dimension(510, 170));
-	    panel_8.setBorder(new LineBorder(SystemColor.activeCaption, 2));
-	    panel_6.add(panel_8);
-	    panel_8.setLayout(new BorderLayout(0, 0));
-	    
-	    JPanel panel_14 = new JPanel();
-	    panel_8.add(panel_14, BorderLayout.CENTER);
-	    panel_14.setLayout(new BoxLayout(panel_14, BoxLayout.Y_AXIS));
-	    
-	    JPanel panel_9 = new JPanel();
-	    panel_14.add(panel_9);
-	    
-	    JLabel lblSearchBy = new JLabel("Search by ");
-	    panel_9.add(lblSearchBy);
-	    
-	    comboBox = new JComboBox<String>();
-	    panel_9.add(comboBox);
-	    
-	    comboBox.addItem("---------------");
-	    comboBox.addItem("general");
-	    comboBox.addItem("error type");
-	    comboBox.addItem("location");
-	    comboBox.addItem("sensor");
-	    comboBox.addItem("time range");
-	    
-	    JPanel panel_19 = new JPanel();
-	    FlowLayout flowLayout = (FlowLayout) panel_19.getLayout();
-	    flowLayout.setAlignment(FlowLayout.LEFT);
-	    panel_14.add(panel_19);
-	    
-	    JLabel lblEnterSearchTerm = new JLabel("Search term:");
-	    panel_19.add(lblEnterSearchTerm);
-	    
-	    textField_1 = new JTextField();
-	    textField_1.setColumns(16);
-	    textField_1.addActionListener(new SearchListener());
-	    panel_19.add(textField_1);
-	    
-	    Component horizontalStrut = Box.createHorizontalStrut(20);
-	    panel_19.add(horizontalStrut);
-	    
-	    JLabel lblError = new JLabel("Error:");
-	    panel_19.add(lblError);
-	    
-	    comboBox_6 = new JComboBox<String>();
-	    comboBox_6.addItem("data loss");
-	    comboBox_6.addItem("idle miss");
-	    comboBox_6.addItem("parity");
-	    panel_19.add(comboBox_6);
-	    
-	    JPanel panel_12 = new JPanel();
-	    panel_14.add(panel_12);
-	    
-	    JLabel lblLocation = new JLabel("Location (rack/module/line):");
-	    panel_12.add(lblLocation);
-	    
-	    comboBox_1 = new JComboBox<Integer>();
-	    comboBox_1.addItem(0);
-	    comboBox_1.addItem(1);
-	    comboBox_1.addItem(2);
-	    comboBox_1.addItem(3);
-	    panel_12.add(comboBox_1);
-	    
-	    comboBox_2 = new JComboBox<Integer>();
-	    comboBox_2.addItem(0);
-	    comboBox_2.addItem(1);
-	    comboBox_2.addItem(2);
-	    comboBox_2.addItem(3);
-	    comboBox_2.addItem(4);
-	    comboBox_2.addItem(5);
-	    panel_12.add(comboBox_2);
-	    
-	    comboBox_3 = new JComboBox<Integer>();
-	    comboBox_3.addItem(0);
-	    comboBox_3.addItem(1);
-	    comboBox_3.addItem(2);
-	    comboBox_3.addItem(3);
-	    panel_12.add(comboBox_3);
+	}
 
-	    JLabel lblSensormoduleline = new JLabel("   Sensor (module/line):");
-	    panel_12.add(lblSensormoduleline);
+	private void initOptionsPanel(JPanel mainSubPanel) {
+		ButtonGroup group1 = new ButtonGroup();
+		JPanel optionsPanel = new JPanel();
+	    mainSubPanel.add(optionsPanel);
+	    optionsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 	    
-	    comboBox_4 = new JComboBox<Integer>();
-	    comboBox_4.addItem(0);
-	    comboBox_4.addItem(1);
-	    comboBox_4.addItem(2);
-	    comboBox_4.addItem(3);
-	    comboBox_4.addItem(4);
-	    comboBox_4.addItem(5);
-	    panel_12.add(comboBox_4);
+	    JPanel optionsSubPanel = new JPanel();
+	    optionsPanel.add(optionsSubPanel);
+	    optionsSubPanel.setPreferredSize(new Dimension(664, 80));
+	    optionsSubPanel.setBorder(new LineBorder(SystemColor.activeCaption, 2));
+	    optionsSubPanel.setLayout(new GridLayout(0, 6, 0, 0));
 	    
-	    comboBox_5 = new JComboBox<Integer>();
-	    comboBox_5.addItem(0);
-	    comboBox_5.addItem(1);
-	    comboBox_5.addItem(2);
-	    comboBox_5.addItem(3);
-	    panel_12.add(comboBox_5);
+	    Component horizontalGlue_1 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_1);
 	    
-	    JPanel panel_10 = new JPanel();
-	    panel_14.add(panel_10);
-	    panel_10.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+	    Component horizontalGlue_9 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_9);
 	    
-	    JLabel lblTimeFrameFrom = new JLabel("Time Frame:   from");
-	    panel_10.add(lblTimeFrameFrom);
+	    JLabel lblOutput = new JLabel("Output:");
+	    optionsSubPanel.add(lblOutput);
 	    
-	    textField_3 = new JTextField();
-	    panel_10.add(textField_3);
-	    textField_3.setColumns(10);
+	    Component horizontalGlue_2 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_2);
 	    
-	    JLabel lblTo = new JLabel("to");
-	    panel_10.add(lblTo);
+	    JLabel lblInclude = new JLabel("Include:");
+	    optionsSubPanel.add(lblInclude);
 	    
-	    textField_4 = new JTextField();
-	    textField_4.setColumns(10);
+	    Component horizontalGlue_3 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_3);
+	    
+	    outputWarnLbl = new JLabel("");
+	    outputWarnLbl.setForeground(Color.red);
+	    optionsSubPanel.add(outputWarnLbl);
+	    
+	    Component horizontalGlue_10 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_10);
+	    
+	    chckbxToConsole = new JCheckBox("to console");
+	    optionsSubPanel.add(chckbxToConsole); 
+	    
+	    Component horizontalGlue_5 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_5);
+	    
+	    rdbtnErrorsOnly = new JRadioButton("errors only");
+	    optionsSubPanel.add(rdbtnErrorsOnly);
+	    group1.add(rdbtnErrorsOnly);
+	    
+	    Component horizontalGlue_6 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_6);
+	    
+	    modeWarnLbl = new JLabel("");
+	    modeWarnLbl.setForeground(Color.red);
+	    optionsSubPanel.add(modeWarnLbl);
+	    
+	    Component horizontalGlue_11 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_11);
+	    
+	    chckbxToTextFile = new JCheckBox("to text file");
+	    optionsSubPanel.add(chckbxToTextFile);
+	    
+	    Component horizontalGlue_8 = Box.createHorizontalGlue();
+	    optionsSubPanel.add(horizontalGlue_8);
+	    
+	    rdbtnAllRecords = new JRadioButton("all records");
+	    optionsSubPanel.add(rdbtnAllRecords);
+	    group1.add(rdbtnAllRecords);
+	}
 
-	    panel_10.add(textField_4);
-	    
-	    JLabel lblEx = new JLabel("ex.: 6/27/2016 13:40:46");
-	    lblEx.setForeground(SystemColor.windowBorder);
-	    panel_10.add(lblEx);
-	    
-	    Component horizontalGlue = Box.createHorizontalGlue();
-	    panel_10.add(horizontalGlue);
-	    
-	    JPanel panel_13 = new JPanel();
-	    panel_8.add(panel_13, BorderLayout.SOUTH);
-	    
-	    JButton btnSearch = new JButton("");
-	    JLabel searchLbl = new JLabel("Search");
-	    btnSearch.add(searchLbl);
-
-	    panel_13.add(btnSearch);
-	    
-	    JPanel panel_17 = new JPanel();
-	    panel_17.setPreferredSize(new Dimension(640, 60));
-	    panel_1.add(panel_17);
-	    
-	    warnLabel = new JLabel("");
-	    panel_17.add(warnLabel);
+	private void initFrame() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 680, 480);
+		frame.setTitle("CAT");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+		frame.getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_3 = new JPanel();
-		frame.getContentPane().add(panel_3, BorderLayout.SOUTH);
-		
-		JLabel lblcopy = new JLabel("\u00a9 2016");
-		panel_3.add(lblcopy);	
-		
-	    textField_1.addActionListener(new SearchListener());
-	    textField_4.addActionListener(new SearchListener());
-	    btnSearch.addActionListener(new SearchListener());
-	    comboBox.addActionListener(new SearchOptionListener());
-		lockFields();
+		java.net.URL iconURL = getClass().getResource("cat-paw.png");
+		ImageIcon icon = new ImageIcon(iconURL);
+		frame.setIconImage(icon.getImage());
 	}
 
 	/**
@@ -475,16 +495,16 @@ public class Frame {
 			
 			String term = "";
 			
-			String option = (String) comboBox.getSelectedItem();
+			String option = (String) searchBy_comboBox.getSelectedItem();
 			
 			switch (option) {
-			case "general": term = textField_1.getText(); break;
-			case "error type": term = comboBox_6.getSelectedItem() + ""; break;
-			case "location": term = comboBox_1.getSelectedItem() + "/" + comboBox_2.getSelectedItem() + "/" + comboBox_3.getSelectedItem(); break;
-			case "sensor": term = comboBox_4.getSelectedItem() + "/" + comboBox_5.getSelectedItem(); break;
+			case "general": term = searchTerm_textField.getText(); break;
+			case "error type": term = errorType_comboBox.getSelectedItem() + ""; break;
+			case "location": term = locationRack_comboBox.getSelectedItem() + "/" + locationModule_comboBox.getSelectedItem() + "/" + locationLine_comboBox.getSelectedItem(); break;
+			case "sensor": term = sensorModule_comboBox.getSelectedItem() + "/" + sensorLine_comboBox.getSelectedItem(); break;
 			case "time range": 
-				String from = textField_3.getText().trim();
-				String till = textField_4.getText().trim();
+				String from = timeFrameFrom_textField.getText().trim();
+				String till = timeFrameTo_textField.getText().trim();
 				term = from + "\n" + till; 
 				break;
 			default: JOptionPane.showMessageDialog(null, "'Search by' option does not match any of the supported options", "Error", JOptionPane.ERROR_MESSAGE);
@@ -538,23 +558,23 @@ public class Frame {
               
               switch (option) {
   				case "general": 
-  					textField_1.setEditable(true); 
+  					searchTerm_textField.setEditable(true); 
   					break;
   				case "error type": 
-  					comboBox_6.setEnabled(true); 
+  					errorType_comboBox.setEnabled(true); 
   					break;
   				case "location":
-  					comboBox_1.setEnabled(true);
-  					comboBox_2.setEnabled(true);
-  					comboBox_3.setEnabled(true);
+  					locationRack_comboBox.setEnabled(true);
+  					locationModule_comboBox.setEnabled(true);
+  					locationLine_comboBox.setEnabled(true);
   					break;
   				case "sensor": 
-  					comboBox_4.setEnabled(true);
-  					comboBox_5.setEnabled(true);
+  					sensorModule_comboBox.setEnabled(true);
+  					sensorLine_comboBox.setEnabled(true);
   					break;
   				case "time range": 
-	  				textField_3.setEditable(true);
-	  				textField_4.setEditable(true);
+	  				timeFrameFrom_textField.setEditable(true);
+	  				timeFrameTo_textField.setEditable(true);
 	  				break;
   			  }
 	      }
@@ -585,18 +605,18 @@ public class Frame {
     * A helper method that sets makes all fields in the search area uneditable; used by the SearchOptionListener inner class.
     */
    private void lockFields() {
-	   	textField_1.setText("");
-	    textField_1.setEditable(false);
-	    textField_3.setText("");
-	    textField_3.setEditable(false);
-	    textField_4.setText("");
-	    textField_4.setEditable(false);
-	    comboBox_1.setEnabled(false);
-	    comboBox_2.setEnabled(false);
-	    comboBox_3.setEnabled(false);
-	    comboBox_4.setEnabled(false);
-	    comboBox_5.setEnabled(false); 
-	    comboBox_6.setEnabled(false);
+	   	searchTerm_textField.setText("");
+	    searchTerm_textField.setEditable(false);
+	    timeFrameFrom_textField.setText("");
+	    timeFrameFrom_textField.setEditable(false);
+	    timeFrameTo_textField.setText("");
+	    timeFrameTo_textField.setEditable(false);
+	    locationRack_comboBox.setEnabled(false);
+	    locationModule_comboBox.setEnabled(false);
+	    locationLine_comboBox.setEnabled(false);
+	    sensorModule_comboBox.setEnabled(false);
+	    sensorLine_comboBox.setEnabled(false); 
+	    errorType_comboBox.setEnabled(false);
    }
 	   
    /**
@@ -644,7 +664,7 @@ public class Frame {
 	private boolean validateSearchOption() {
 
 		String warning = "";
-		String option = (String) comboBox.getSelectedItem();
+		String option = (String) searchBy_comboBox.getSelectedItem();
 
 		switch (option) {
 
@@ -653,7 +673,7 @@ public class Frame {
 			break;
 
 		case "general":
-			if (textField_1.getText() == null || textField_1.getText().trim().isEmpty()) {
+			if (searchTerm_textField.getText() == null || searchTerm_textField.getText().trim().isEmpty()) {
 				warning += "Please enter search term<br>";
 			}
 			break;
@@ -662,13 +682,13 @@ public class Frame {
 			break;
 
 		case "time range":
-			if (textField_3.getText() == null || textField_4.getText() == null) {
+			if (timeFrameFrom_textField.getText() == null || timeFrameTo_textField.getText() == null) {
 				warning += "Please enter time range<br>";
 				break;
 			}
 
-			String from = textField_3.getText().trim();
-			String till = textField_4.getText().trim();
+			String from = timeFrameFrom_textField.getText().trim();
+			String till = timeFrameTo_textField.getText().trim();
 			if (!(checkDateTimeFormat(from) && checkDateTimeFormat(till))) {
 				warning += "Incorrect format of time range<br>";
 			}

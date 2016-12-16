@@ -198,7 +198,7 @@ public class Error {
 	 * @return true if the error contains the search term, false otherwise
 	 */
 	public boolean contains(String searchTerm) {
-		if (this.toString().contains(searchTerm)) {
+		if (this.toString().toLowerCase().contains(searchTerm)) {
 			return true;
 		}
 		return false;

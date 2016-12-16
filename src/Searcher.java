@@ -172,7 +172,6 @@ public class Searcher {
 				try {
 					lineDateTime = parseDateTime(dateAndTime);
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					return false;														
 				}
 				
