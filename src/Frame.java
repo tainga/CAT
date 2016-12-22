@@ -301,6 +301,7 @@ public class Frame {
 	    inputPanel.add(inputFolder_textField);
 	    inputFolder_textField.setEditable(false);
 	    fcIn = new JFileChooser();
+	    fcIn.setCurrentDirectory(new File("C:\\Users\\Anastasia Taing\\Desktop\\CGW project\\example save crash\\vpsSYS2_27Jun2016_12_27_25_cgw1e\\CGWLOGS\\control"));
 	    fcIn.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	    
 	    btnInputFolder.addActionListener(new ActionListener() {
@@ -387,6 +388,7 @@ public class Frame {
 	    optionsSubPanel.add(horizontalGlue_10);
 	    
 	    chckbxToConsole = new JCheckBox("to console");
+	    chckbxToConsole.setSelected(true);
 	    optionsSubPanel.add(chckbxToConsole); 
 	    
 	    Component horizontalGlue_5 = Box.createHorizontalGlue();
@@ -413,6 +415,7 @@ public class Frame {
 	    optionsSubPanel.add(horizontalGlue_8);
 	    
 	    rdbtnAllRecords = new JRadioButton("all records");
+	    rdbtnAllRecords.setSelected(true);
 	    optionsSubPanel.add(rdbtnAllRecords);
 	    group1.add(rdbtnAllRecords);
 	}
@@ -729,7 +732,7 @@ public class Frame {
 		PopUp frame = null;
 		try {
 			frame = new PopUp();
-			frame.setVisible(false);
+			frame.setVisible(true);
 
 			java.net.URL iconURL = getClass().getResource("cat-paw.png");
 			ImageIcon icon = new ImageIcon(iconURL);
