@@ -17,15 +17,15 @@ public class Reader {
 	 * or all error-related records only (if errorsOnly is true). Prints all found data to a text file and/or a text window as specified by the user.	
 	 * @param inputDirectory a path to the directory containing the log files
 	 * @param pop an output window
-	 * @param outputPath a path to the directory in which an output text file is to be created
+	 * @param outputFile a path to the directory in which an output text file is to be created
 	 * @param errorsOnly a boolean specifying whether the report should contain error messages only
 	 * @param toConsole a boolean specifying whether the output should be directed to an output window
 	 * @param toTextFile a boolean specifying whether the output should be directed to a text file
 	 * @return the number of records found
 	 */
-	public int parseLog(String inputDirectory, PopUp pop, String outputPath, boolean errorsOnly, boolean toConsole, boolean toTextFile) {
+	public int parseLog(String inputDirectory, PopUp pop, String outputFile, boolean errorsOnly, boolean toConsole, boolean toTextFile) {
 
-		if (toTextFile && (outputPath == null || outputPath.trim().isEmpty())) {
+		if (toTextFile && (outputFile == null || outputFile.trim().isEmpty())) {
 			JOptionPane.showMessageDialog(null, "Output destination not specified", "Error", JOptionPane.ERROR_MESSAGE);
 			return 0;
 		}
@@ -54,9 +54,9 @@ public class Reader {
 		PrintWriter writer = null;
 		if (toTextFile) {
 			try {
-				writer = new PrintWriter(outputPath);
+				writer = new PrintWriter(outputFile);
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, "Unable to create output file in directory: " + outputPath, "Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Unable to create output file: " + outputFile, "Error", JOptionPane.ERROR_MESSAGE);
 			}
 		}
 

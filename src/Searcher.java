@@ -139,14 +139,8 @@ public class Searcher {
 				return matchFound;
 			}
 			
-			case "error type": {
-				return line.toLowerCase().contains(searchTerm);
-			}
-			
-			case "location": {
-				return line.toLowerCase().contains(searchTerm);
-			}
-			
+			case "error type": 			
+			case "location": 			
 			case "sensor": {
 				return line.toLowerCase().contains(searchTerm);
 			}

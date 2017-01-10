@@ -6,7 +6,10 @@ import java.awt.event.WindowListener;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Semaphore;
+
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -27,7 +30,6 @@ public class PopUp extends JFrame {
 	private Consumer consumer;
 	private JPanel contentPane;
 	private JTextArea textArea;
-	private JScrollPane jsp;
 	private LinkedList<String> queue;
 	private Semaphore sem;
 	private Semaphore mutex;
@@ -49,7 +51,7 @@ public class PopUp extends JFrame {
 		
 		textArea = new JTextArea();
 		
-		jsp = new JScrollPane(textArea);
+		JScrollPane jsp = new JScrollPane(textArea);
 		jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		
 		queue = new LinkedList<>();
@@ -82,6 +84,7 @@ public class PopUp extends JFrame {
 		consumer.start();
 		
 		this.addWindowListener(exitListener);
+		setIconImage(new ImageIcon(getClass().getResource("cat-paw.png")).getImage());
 	}
 
 	/**
@@ -91,9 +94,8 @@ public class PopUp extends JFrame {
 	public void addText(String text) {
 		try {
 			mutex.acquire();
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		queue.add(text);
 		mutex.release();
@@ -112,8 +114,7 @@ public class PopUp extends JFrame {
 					sem.acquire(1);
 					mutex.acquire();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 				try {
 					textArea.append(queue.pop());
@@ -123,8 +124,7 @@ public class PopUp extends JFrame {
 	        		try {
 	        			Thread.sleep(1);
 	        		} catch (InterruptedException e) {
-	        			// TODO Auto-generated catch block
-	        			e.printStackTrace();
+	        			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	        		}
 				} catch (NoSuchElementException e) {
         			break;

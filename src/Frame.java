@@ -34,7 +34,7 @@ import java.awt.SystemColor;
  */
 public class Frame {
 
-	JFrame frame;
+	private JFrame frame;
 	private JTextField searchTerm_textField;
 	private JCheckBox chckbxToConsole;
 	private JCheckBox chckbxToTextFile;
@@ -45,7 +45,7 @@ public class Frame {
     private JTextField inputFolder_textField;
     private JTextField outputFolder_textField;
     private String inputDirectory;
-    private String outputDirectory;
+    private String outputFile;
     private JLabel warnLabel;
     private JLabel outputWarnLbl;
     private JLabel modeWarnLbl;
@@ -59,20 +59,21 @@ public class Frame {
 	private JComboBox<Integer> sensorLine_comboBox;
 	private JComboBox<String> errorType_comboBox;
 	private PopUp pop;
-
-
+	
 	/**
 	 * Class constructor
 	 */
 	public Frame() {
-		initialize();
-	}
-	
-	/**
-	 * A helper method to initialize the components of the frame.
-	 */
-	private void initialize() {
-		initFrame();
+		
+		frame = new JFrame();
+		frame.setBounds(100, 100, 680, 480);
+		frame.setTitle("CAT");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
+		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		
+		ImageIcon icon = new ImageIcon(getClass().getResource("cat-paw.png"));
+		frame.setIconImage(icon.getImage());
 		
 		JPanel titlePanel = new JPanel();
 		frame.getContentPane().add(titlePanel, BorderLayout.NORTH);
@@ -107,6 +108,8 @@ public class Frame {
 		
 		JLabel lblcopy = new JLabel("\u00a9 2016");
 		copyrightPanel.add(lblcopy);	
+		
+		frame.setVisible(true);
 		
 
 	}
@@ -343,8 +346,8 @@ public class Frame {
 	    	    
 	    	    if(returnValue == JFileChooser.APPROVE_OPTION && fcOut.getSelectedFile() != null)
 	    	    {
-	    	    	outputDirectory = fcOut.getSelectedFile().getAbsolutePath();
-	    	    	outputFolder_textField.setText(outputDirectory);
+	    	    	outputFile = fcOut.getSelectedFile().getAbsolutePath();
+	    	    	outputFolder_textField.setText(outputFile);
 	    	    }
 	    	}
 	    });
@@ -420,19 +423,7 @@ public class Frame {
 	    group1.add(rdbtnAllRecords);
 	}
 
-	private void initFrame() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 680, 480);
-		frame.setTitle("CAT");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(false);
-		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		
-		java.net.URL iconURL = getClass().getResource("cat-paw.png");
-		ImageIcon icon = new ImageIcon(iconURL);
-		frame.setIconImage(icon.getImage());
-	}
-
+	
 	/**
 	 * Inner class to initiate generation of a report when the 'generate' button is pressed.
 	 *
@@ -441,16 +432,14 @@ public class Frame {
 		
 		public void actionPerformed(ActionEvent e) {
 
-			boolean userSelectionsAreValid = validateUserSelections();
-			if (!userSelectionsAreValid) return;
+			if (!validateUserSelections()) return;
 
 			initializeOutput();
 
 			Reader reader = new Reader();
 			int numberOfEntries = 0;
-			String warning = "";
 
-			numberOfEntries = reader.parseLog(inputDirectory, pop, outputDirectory, rdbtnErrorsOnly.isSelected(),
+			numberOfEntries = reader.parseLog(inputDirectory, pop, outputFile, rdbtnErrorsOnly.isSelected(),
 					chckbxToConsole.isSelected(), chckbxToTextFile.isSelected());
 
 			if (numberOfEntries == 0) {
@@ -458,24 +447,24 @@ public class Frame {
 					pop.dispose();
 				}
 				if (chckbxToTextFile.isSelected()) {
-					File fl = new File(outputDirectory);
+					File fl = new File(outputFile);
 					try {
 						fl.delete();
 					} catch (Exception e1) {
 						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
-				warning = "<html><div style='text-align:center; color:red'>No records found</div></html>";
-				warnLabel.setText(warning);
+			
+				warnLabel.setText("<html><div style='text-align:center; color:red'>No records found</div></html>");
 			}
 
 			else {
 				if (chckbxToConsole.isSelected() && pop != null) {
 					pop.setVisible(true);
 				}
-				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries
-						+ " records found</div></html>";
-				warnLabel.setText(warning);
+				
+				warnLabel.setText("<html><div style='text-align:center; color:green'>" + numberOfEntries
+						+ " records found</div></html>");
 			}
 
 		}
@@ -490,11 +479,7 @@ public class Frame {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			boolean userSelectionsAreValid = validateUserSelections();
-			if (!userSelectionsAreValid) return;
-			
-			boolean searchOptionIsValid = validateSearchOption();
-			if (!searchOptionIsValid) return;
+			if (!validateUserSelections() || !validateSearchOption()) return;
 			
 			String term = "";
 			
@@ -514,33 +499,32 @@ public class Frame {
 			}
 			
 			int numberOfEntries = 0;
-			String warning = "";
 	    	
 			initializeOutput();
 			Searcher finder = new Searcher();
-			numberOfEntries = finder.search(option, inputDirectory, outputDirectory, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
+			numberOfEntries = finder.search(option, inputDirectory, outputFile, term, rdbtnErrorsOnly.isSelected(), chckbxToTextFile.isSelected(), chckbxToConsole.isSelected(), pop);
 			
 			if (numberOfEntries == 0) {
 				if (chckbxToConsole.isSelected() && pop != null) {
 					pop.dispose();
 				}
 				if (chckbxToTextFile.isSelected()) {
-					File fl = new File(outputDirectory);
+					File fl = new File(outputFile);
 					try {
-						fl.delete();
+						if (fl.exists()) fl.delete();
 					} catch (Exception e1) {
 						JOptionPane.showMessageDialog(null, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					}
 				}
-				warning = "<html><div style='text-align:center; color:red'>No records found</div></html>";
-	    		warnLabel.setText(warning);
+				
+	    		warnLabel.setText("<html><div style='text-align:center; color:red'>No records found</div></html>");
 			}
 			else {
 				if (pop != null && chckbxToConsole.isSelected()) {
 					pop.setVisible(true);
 				}
-				warning = "<html><div style='text-align:center; color:green'>" + numberOfEntries + " records found</div></html>";
-	    		warnLabel.setText(warning);
+				
+	    		warnLabel.setText("<html><div style='text-align:center; color:green'>" + numberOfEntries + " records found</div></html>");
 			}
 		}
 
@@ -643,7 +627,7 @@ public class Frame {
 			modeWarnLbl.setText("Select mode");
 			modeAndDestinationChosen = false;
 		}
-		if (chckbxToTextFile.isSelected() && outputDirectory == null) {
+		if (chckbxToTextFile.isSelected() && outputFile == null) {
 			warning += "Please select output directory<br>";
 		}
 		if (inputDirectory == null) {
@@ -715,8 +699,8 @@ public class Frame {
 	private void initializeOutput() {
 		if (chckbxToTextFile.isSelected()) {
 		    String dateTime = LocalDateTime.now().toString().replace(':', '\'').replace('T', ' ');
-		    outputDirectory = fcOut.getSelectedFile().getAbsolutePath();
-			outputDirectory += "\\CAT " + dateTime + ".txt";
+		    outputFile = fcOut.getSelectedFile().getAbsolutePath();
+			outputFile += "\\CAT " + dateTime + ".txt";
 	    }
     	
 		if (chckbxToConsole.isSelected()) {
@@ -729,19 +713,7 @@ public class Frame {
 	 * @return a frame created by the PopUp class
 	 */
 	private PopUp popup() {
-		PopUp frame = null;
-		try {
-			frame = new PopUp();
-			frame.setVisible(true);
-
-			java.net.URL iconURL = getClass().getResource("cat-paw.png");
-			ImageIcon icon = new ImageIcon(iconURL);
-			frame.setIconImage(icon.getImage());
-
-		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-		}
-		return frame;
+		return new PopUp();
 	}
 
 }

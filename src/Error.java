@@ -13,12 +13,16 @@ public class Error {
 	private String originalStatus;
 	private String date;
 	private String time;
-	private double BLR;
-	private double thresh;
+	private double BLR = -1;
+	private double thresh = -1;
 	private String type;
 	private String location;
 	private boolean blrThreshLocationIsSet;
 	private String brk = System.lineSeparator();
+	private final String ERROR_IDLE_MISS = "Idle miss";
+	private final String ERROR_DATA_LOSS = "Data loss";
+	private final String ERROR_PARITY = "Parity";
+	private final String ERROR_UNKNOWN = "0";
 	
 	/**
 	 * Constructor. Used for error messages with a preceding status line.
@@ -83,17 +87,11 @@ public class Error {
 			String sub = statusLine.substring(blrLocation + 4);
 			this.BLR = Double.parseDouble(sub.split(" ")[0]);
 		}
-		else {
-			this.BLR = -1;
-		}
 		
 		int thrLocation = statusLine.indexOf("BLR_THRESH=");
 		if (thrLocation != -1) {
 			String sub = statusLine.substring(thrLocation + 11);
 			this.thresh = Double.parseDouble(sub.split(" ")[0]);
-		}
-		else {
-			this.thresh = -1;
 		}
 		
 		int locationIndex = -1;
@@ -121,15 +119,15 @@ public class Error {
 	private void parseType(String errorMsg) {
 		String msg = errorMsg.toLowerCase();
 		if (msg.contains("sync_rx_idle_misses")) {
-			type = "Idle miss";
+			type = ERROR_IDLE_MISS;
 		}
 		else if (msg.contains("sync_rx_data_losses")) {
-			type = "Data loss";
+			type = ERROR_DATA_LOSS;
 		}
 		else if (msg.contains("sync_rx_parity_errs")) {
-			type = "Parity";
+			type = ERROR_PARITY;
 		}
-		else {type = "0";}
+		else {type = ERROR_UNKNOWN;}
 	}	
 	
 	/**
@@ -158,7 +156,7 @@ public class Error {
 		if (time !=null) {
 			output += time + " ";
 		}
-		if (!type.equals("0") && type != null) {
+		if (type != null && !type.equals(ERROR_UNKNOWN)) {
 			output += type + " error";
 		}
 		if (location != null) {
@@ -173,7 +171,7 @@ public class Error {
 			}
 		}
 		if (!blrThreshLocationIsSet) {
-			if (type.equals("Idle miss") || type.equals("Data loss") || type.equals("Parity")) {
+			if (!type.equals(ERROR_UNKNOWN)) {
 				if (originalStatus != null) {
 					output +=  brk + originalStatus;
 				}
