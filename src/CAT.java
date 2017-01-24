@@ -1,7 +1,7 @@
 /**
  * The main class that launches the application.
  * @author Anastasia Taing
- * @version 1.0 November 2016
+ * @version 1.1 January 2017
  */
 public class CAT {
 		

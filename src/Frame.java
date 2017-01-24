@@ -304,7 +304,6 @@ public class Frame {
 	    inputPanel.add(inputFolder_textField);
 	    inputFolder_textField.setEditable(false);
 	    fcIn = new JFileChooser();
-	    fcIn.setCurrentDirectory(new File("C:\\Users\\Anastasia Taing\\Desktop\\CGW project\\example save crash\\vpsSYS2_27Jun2016_12_27_25_cgw1e\\CGWLOGS\\control"));
 	    fcIn.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 	    
 	    btnInputFolder.addActionListener(new ActionListener() {

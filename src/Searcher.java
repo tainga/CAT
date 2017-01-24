@@ -127,6 +127,7 @@ public class Searcher {
 		
 		switch (searchType) {
 		
+			case "error type": 
 			case "general": {
 				// supports several search terms divided by , _ or whitespace
 				String[] terms = searchTerm.split("\\s*(_|,|\\s)\\s*");
@@ -139,7 +140,6 @@ public class Searcher {
 				return matchFound;
 			}
 			
-			case "error type": 			
 			case "location": 			
 			case "sensor": {
 				return line.toLowerCase().contains(searchTerm);
